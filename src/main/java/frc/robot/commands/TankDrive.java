@@ -11,8 +11,8 @@ public class TankDrive extends CommandBase {
     private OperatingInterface oInterface;
 
     public TankDrive() {
-        addRequirements(RobotContainer.mdDrivetrain);
-        drivetrain = RobotContainer.mdDrivetrain;
+        addRequirements(RobotContainer.mDrivetrain);
+        drivetrain = RobotContainer.mDrivetrain;
         oInterface = RobotContainer.oInterface;
     }
     

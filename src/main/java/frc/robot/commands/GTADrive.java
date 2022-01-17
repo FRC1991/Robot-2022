@@ -11,7 +11,7 @@ public class GTADrive extends CommandBase {
     private OperatingInterface oInterface;
     
     public GTADrive() {
-        drivetrain = RobotContainer.mdDrivetrain;
+        drivetrain = RobotContainer.mDrivetrain;
         oInterface = RobotContainer.oInterface;
         addRequirements(drivetrain);
     }
@@ -29,7 +29,7 @@ public class GTADrive extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return super.isFinished();
+        return false;
     }
 
     @Override

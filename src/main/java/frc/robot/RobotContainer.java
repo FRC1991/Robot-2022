@@ -29,7 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
-  public static Drivetrain mdDrivetrain = new Drivetrain();
+  public static Drivetrain mDrivetrain = new Drivetrain();
   public static OperatingInterface oInterface = new OperatingInterface();
   public static ColorSensor mColorSensor = new ColorSensor();
 
@@ -47,7 +47,7 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // GTADrive gtaDrive = new GTADrive();
-    // mdDrivetrain.setDefaultCommand(gtaDrive);
+    // mDrivetrain.setDefaultCommand(gtaDrive);
     JoystickButton aButton = new JoystickButton(oInterface.driveJoystick, 1);
     aButton.whenPressed(new InstantCommand(()->{System.out.printf("Blue: %d, Red: %d, Green: %d\n", mColorSensor.getBlue(), mColorSensor.getRed(), mColorSensor.getGreen());}, mColorSensor));
     

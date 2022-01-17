@@ -64,6 +64,10 @@ public class Drivetrain extends SubsystemBase {
         differentialDrive.curvatureDrive(speed, rotation, isQuickTurn);
     }
 
+    public void arcadeDrive(double speed, double rotation){
+        differentialDrive.arcadeDrive(speed, rotation);
+    }
+
     public void setGTADriveV2(double forwardSpeed, double backwardSpeed, double rotation, boolean isQuickTurn){
         forwardSpeed = 0.3*forwardSpeed;
         backwardSpeed = 0.3*backwardSpeed;
