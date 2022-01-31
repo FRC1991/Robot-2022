@@ -17,7 +17,7 @@ public class Drivetrain extends SubsystemBase {
     private DifferentialDrive differentialDrive;
     private static double DEADBAND = 0.1;
 
-    private CANSparkMax leftMotor1, leftMotor2, rightMotor1, rightMotor2;
+    private final CANSparkMax leftMotor1, leftMotor2, rightMotor1, rightMotor2;
 
     public Drivetrain() {
         // define motors with CAN IDs
@@ -33,7 +33,7 @@ public class Drivetrain extends SubsystemBase {
 
         leftMotor2.follow(leftMotor1);
         rightMotor2.follow(rightMotor1);
-        
+
         differentialDrive = new DifferentialDrive(leftMotor1, rightMotor1);
     }
 
@@ -68,19 +68,18 @@ public class Drivetrain extends SubsystemBase {
         differentialDrive.arcadeDrive(speed, rotation);
     }
 
-    public void setGTADriveV2(double forwardSpeed, double backwardSpeed, double rotation, boolean isQuickTurn){
-        forwardSpeed = 0.3*forwardSpeed;
-        backwardSpeed = 0.3*backwardSpeed;
-        forwardSpeed = -1*forwardSpeed;
+    public void setGTADriveV2(double forwardSpeed, double backwardSpeed, double rotation, boolean isQuickTurn, double multiplier){
+        forwardSpeed = multiplier*forwardSpeed;
+        backwardSpeed = -1*multiplier*backwardSpeed;
         double netSpeed = forwardSpeed + backwardSpeed;
         if(Math.abs(netSpeed)>DEADBAND){
-            differentialDrive.curvatureDrive(netSpeed, 0.2*rotation, isQuickTurn);
+            differentialDrive.curvatureDrive(netSpeed, multiplier*rotation, isQuickTurn);
         }
         else if(Math.abs(netSpeed)>0.01){
-            setDrivetrain(-rotation, rotation, 0.2);
+            setDrivetrain(-rotation, rotation, multiplier);
         }
         else{
-            setDrivetrain(rotation, -rotation, 0.2);
+            setDrivetrain(rotation, -rotation, multiplier);
         }
     }
 

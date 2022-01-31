@@ -4,20 +4,29 @@
 
 package frc.robot;
 
+import java.security.KeyStore.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.commands.BallChase;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.GTADrive;
+// import frc.robot.commands.GetDistanceLiDAR;
 import frc.robot.commands.TankDrive;
 import frc.robot.subsystems.ColorSensor;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.LiDAR;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
@@ -31,11 +40,19 @@ public class RobotContainer {
 
   public static Drivetrain mDrivetrain = new Drivetrain();
   public static OperatingInterface oInterface = new OperatingInterface();
-  public static ColorSensor mColorSensor = new ColorSensor();
+  // public static ColorSensor mColorSensor = new ColorSensor();
+  // public static LiDAR mLiDAR = new LiDAR();
+  public static double centerXSteer = 0;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the button bindings
+    NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
+    NetworkTable nt = ntInst.getTable("limelight");
+    nt.addEntryListener("tx", (table, key, entry, value, flags) -> {
+      centerXSteer = value.getDouble()*0.015;
+      System.out.println(centerXSteer);
+    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
     configureButtonBindings();
   }
 
@@ -46,13 +63,15 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    mDrivetrain.setDefaultCommand(new BallChase(()->(centerXSteer)));
+    // mDrivetrain.setDefaultCommand(new TankDrive());
+    // mDrivetrain.arcadeDrive(0.5, centerXSteer);
     // GTADrive gtaDrive = new GTADrive();
     // mDrivetrain.setDefaultCommand(gtaDrive);
-    JoystickButton aButton = new JoystickButton(oInterface.driveJoystick, 1);
-    aButton.whenPressed(new InstantCommand(()->{System.out.printf("Blue: %d, Red: %d, Green: %d\n", mColorSensor.getBlue(), mColorSensor.getRed(), mColorSensor.getGreen());}, mColorSensor));
-    
-    
-
+    // JoystickButton aButton = new JoystickButton(oInterface.driveJoystick, 1);
+    // aButton.whenPressed(new InstantCommand(()->{System.out.printf("Blue: %d, Red: %d, Green: %d\n", mColorSensor.getBlue(), mColorSensor.getRed(), mColorSensor.getGreen());}, mColorSensor));
+    // mLiDAR.setDefaultCommand(new GetDistanceLiDAR());
+    // aButton.whenPressed(new GetDistanceLiDAR());
   }
 
   /**
