@@ -1,19 +1,22 @@
 package frc.robot.commands;
 
+import java.util.function.Supplier;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.OperatingInterface;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
 
 public class TankDrive extends CommandBase {
     
     private Drivetrain drivetrain;
-    private OperatingInterface oInterface;
+    private final double MULTIPLIER = 0.6;
+    private final Supplier<Double> leftSpeed, rightSpeed;
 
-    public TankDrive() {
-        addRequirements(RobotContainer.mDrivetrain);
+    public TankDrive(Supplier<Double> leftSupplier, Supplier<Double> rightSupplier) {
         drivetrain = RobotContainer.mDrivetrain;
-        oInterface = RobotContainer.oInterface;
+        leftSpeed = leftSupplier;
+        rightSpeed = rightSupplier;
+        addRequirements(RobotContainer.mDrivetrain);
     }
     
     @Override
@@ -22,7 +25,7 @@ public class TankDrive extends CommandBase {
 
     @Override
     public void execute() {
-        drivetrain.setDrivetrain(oInterface.getLeftYAxis(), oInterface.getRightYAxis(), 0.60, true);
+        drivetrain.setDrivetrain(leftSpeed.get(), rightSpeed.get(), MULTIPLIER);
     }
 
     @Override
