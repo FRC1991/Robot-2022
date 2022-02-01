@@ -14,7 +14,7 @@ public class Drivetrain extends SubsystemBase {
     private boolean rightMotor1Inverted = true;
     private boolean rightMotor2Inverted = true;
     private DifferentialDrive differentialDrive;
-    private static double DEADBAND = 0.1;
+    private double deadband = Constants.globalDeadband;
 
     private final CANSparkMax leftMotor1, leftMotor2, rightMotor1, rightMotor2;
 
@@ -36,26 +36,28 @@ public class Drivetrain extends SubsystemBase {
         differentialDrive = new DifferentialDrive(leftMotor1, rightMotor1);
     }
 
-    public void setDrivetrainSpeed(double leftSpeed, double rightSpeed){
+    public void setDrivetrain(double leftSpeed, double rightSpeed){
         leftMotor1.set(leftSpeed);
         rightMotor1.set(rightSpeed);
     }
 
     public void setDrivetrain(double leftSpeed, double rightSpeed, double multiplier) {
-        leftMotor1.set(leftSpeed*multiplier);
-        rightMotor1.set(rightSpeed*multiplier);
+        setDrivetrain(leftSpeed*multiplier, rightSpeed*multiplier);
     }
 
-    public void setDrivetrain(double leftSpeed, double rightSpeed, double multiplier, boolean deadband){
-        if(deadband){
-            if(Math.abs(leftSpeed) > DEADBAND)
+    public void setDrivetrain(double leftSpeed, double rightSpeed, double multiplier, boolean isDeadbandEnabled){
+        if(isDeadbandEnabled){
+            if(Math.abs(leftSpeed) > deadband)
                 leftMotor1.set(leftSpeed);
             else 
                 leftMotor1.set(0);
-            if(Math.abs(rightSpeed) > DEADBAND)
+            if(Math.abs(rightSpeed) > deadband)
                 rightMotor1.set(rightSpeed);
             else
                 rightMotor1.set(0);
+        }
+        else{
+            setDrivetrain(leftSpeed, rightSpeed, multiplier);
         }
     }
 
@@ -67,7 +69,7 @@ public class Drivetrain extends SubsystemBase {
         forwardSpeed = multiplier*forwardSpeed;
         backwardSpeed = -1*multiplier*backwardSpeed;
         double netSpeed = forwardSpeed + backwardSpeed;
-        if(Math.abs(netSpeed)>DEADBAND*multiplier){
+        if(Math.abs(netSpeed)>deadband*multiplier){
             differentialDrive.curvatureDrive(netSpeed, multiplier*rotation, isQuickTurn);
         }
         else if(Math.abs(netSpeed)>0.01){
@@ -76,6 +78,10 @@ public class Drivetrain extends SubsystemBase {
         else{
             setDrivetrain(rotation, -rotation, multiplier);
         }
+    }
+
+    public void stopDrivetrain(){
+        setDrivetrain(0, 0);
     }
 
     public double getLeftMotor1Pos(){

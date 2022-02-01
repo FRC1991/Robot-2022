@@ -7,14 +7,15 @@ package frc.robot;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import frc.robot.commands.BallChase;
 import frc.robot.commands.GTADrive;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -27,17 +28,15 @@ public class RobotContainer {
 
   public static Drivetrain mDrivetrain = new Drivetrain();
   public static OperatingInterface oInterface = new OperatingInterface();
+  public static Intake mIntake = new Intake();
   // public static ColorSensor mColorSensor = new ColorSensor();
   // public static LiDAR mLiDAR = new LiDAR();
   public static double centerXSteer = 0;
   public static boolean isTargetFound = false;
-  public static Joystick driveJoystick = oInterface.driveJoystick;
-  public static JoystickButton aButton = new JoystickButton(driveJoystick, 1);
-  public static JoystickButton bButton = new JoystickButton(driveJoystick, 2);
-
+  private GTADrive standardGTADriveCommand = new GTADrive(oInterface::getRightTriggerAxis, oInterface::getLeftTriggerAxis, oInterface::getLeftXAxis, oInterface.getRightBumper()::get);
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    setupNetworkTablesListeners();    
+    visionInit();    
     configureButtonBindings();
   }
 
@@ -58,19 +57,28 @@ public class RobotContainer {
     // aButton.whenPressed(new InstantCommand(()->{System.out.printf("Blue: %d, Red: %d, Green: %d\n", mColorSensor.getBlue(), mColorSensor.getRed(), mColorSensor.getGreen());}, mColorSensor));
     // mLiDAR.setDefaultCommand(new GetDistanceLiDAR());
     // aButton.whenPressed(new GetDistanceLiDAR());
-    mDrivetrain.setDefaultCommand(new GTADrive(oInterface::getRightTriggerAxis, oInterface::getLeftTriggerAxis, oInterface::getLeftXAxis, oInterface::getRightBumper));
-    aButton.whenPressed(new BallChase(()->(centerXSteer), ()->(isTargetFound)));
-    bButton.whenPressed(new GTADrive(oInterface::getRightTriggerAxis, oInterface::getLeftTriggerAxis, oInterface::getLeftXAxis, oInterface::getRightBumper));
+    
+    mDrivetrain.setDefaultCommand(standardGTADriveCommand);
+    oInterface.getAButton().whenPressed(new BallChase(()->(centerXSteer), ()->(isTargetFound)));
+    oInterface.getBButton().whenPressed(standardGTADriveCommand);
+  
   }
 
-  private void setupNetworkTablesListeners() {
+  private void visionInit() {
     NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
     NetworkTable nt = ntInst.getTable("limelight");
+
+    if(DriverStation.getAlliance().equals(Alliance.Red)){
+      nt.getEntry("pipeline").setNumber(0);
+    }
+    else {
+      nt.getEntry("pipeline").setNumber(1);
+    }
 
     nt.addEntryListener("tx", (table, key, entry, value, flags) -> {
       centerXSteer = value.getDouble();
     }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
-    
+
     // nt.addEntryListener("tv", (table, key, entry, value, flags) -> {
     //   isTargetFound = value.getBoolean();
     // }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);

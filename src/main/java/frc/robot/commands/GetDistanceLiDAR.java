@@ -1,41 +1,39 @@
-// package frc.robot.commands;
+//TODO: Finish this
 
-// import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-// import edu.wpi.first.wpilibj2.command.CommandBase;
-// import frc.robot.RobotContainer;
-// import frc.robot.subsystems.LiDAR;
+package frc.robot.commands;
 
-// public class GetDistanceLiDAR extends CommandBase {
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.LiDAR;
 
-//     private LiDAR mLiDAR = RobotContainer.mLiDAR;
+public class GetDistanceLiDAR extends CommandBase {
 
-//     public GetDistanceLiDAR(){
-//         addRequirements(mLiDAR);
-//     }
+    private LiDAR mLiDAR;
 
-//     @Override
-//     public void initialize() {
-//         // TODO Auto-generated method stub
-//     }
+    public GetDistanceLiDAR(LiDAR lidar) {
+        mLiDAR = lidar;
+        addRequirements(mLiDAR);
+    }
 
-//     @Override
-//     public void execute() {
-//         // TODO Auto-generated method stub
-//         // System.out.println(mLiDAR.getDistance());
-//         SmartDashboard.putNumber("LiDAR Distance (cm)", mLiDAR.getDistance());
-//     }
+    @Override
+    public void initialize() {
+    }
 
-//     @Override
-//     public boolean isFinished() {
-//         // TODO Auto-generated method stub
-//         return false;
-//     }
+    @Override
+    public void execute() {
+        // System.out.println(mLiDAR.getDistance());
+        SmartDashboard.putNumber("LiDAR Distance (cm)", mLiDAR.getDistance());
+    }
 
-//     @Override
-//     public void end(boolean interrupted) {
-//         // TODO Auto-generated method stub
-//     }
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+    }
 
     
     
-// }
+}

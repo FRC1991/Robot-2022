@@ -3,13 +3,14 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
 
 public class GTADrive extends CommandBase {
 
     private final Drivetrain drivetrain;
-    private final double MULTIPLIER = 0.3;
+    private final double MULTIPLIER = Constants.GTADriveMultiplier;
     private final  Supplier<Double> forwardSpeed, backwardSpeed, rotation;
     private final Supplier<Boolean> isQuickTurn;
     
@@ -39,6 +40,5 @@ public class GTADrive extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        super.end(interrupted);
     }
 }
