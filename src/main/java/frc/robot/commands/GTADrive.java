@@ -29,7 +29,7 @@ public class GTADrive extends CommandBase {
 
     @Override
     public void execute() {
-        drivetrain.setGTADriveV2(forwardSpeed.get(), backwardSpeed.get(), rotation.get(), isQuickTurn.get(), MULTIPLIER);
+        drivetrain.setGTADrive(forwardSpeed.get(), backwardSpeed.get(), rotation.get(), isQuickTurn.get(), MULTIPLIER);
     }
 
     @Override

@@ -17,4 +17,6 @@ public final class Constants {
     public static int leftMotor2 = 4;
     public static int rightMotor1 = 1;
     public static int rightMotor2 = 2;
+    public static double GTADriveMultiplier = 0.6;
+    public static double xSteerMultiplier = 2;
 }

@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.BallChase;
 import frc.robot.commands.GTADrive;
-import frc.robot.commands.TankDrive;
 import frc.robot.subsystems.Drivetrain;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -31,15 +30,15 @@ public class RobotContainer {
   // public static ColorSensor mColorSensor = new ColorSensor();
   // public static LiDAR mLiDAR = new LiDAR();
   public static double centerXSteer = 0;
+  public static boolean isTargetFound = false;
   public static Joystick driveJoystick = oInterface.driveJoystick;
   public static JoystickButton aButton = new JoystickButton(driveJoystick, 1);
+  public static JoystickButton bButton = new JoystickButton(driveJoystick, 2);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Configure the button bindings
+    setupNetworkTablesListeners();    
     configureButtonBindings();
-    setupNetworkTablesListeners();
-    mDrivetrain.setDefaultCommand(new GTADrive(oInterface::getRightTriggerAxis, oInterface::getLeftTriggerAxis, oInterface::getLeftXAxis, oInterface::getRightBumper));
   }
 
   
@@ -59,15 +58,23 @@ public class RobotContainer {
     // aButton.whenPressed(new InstantCommand(()->{System.out.printf("Blue: %d, Red: %d, Green: %d\n", mColorSensor.getBlue(), mColorSensor.getRed(), mColorSensor.getGreen());}, mColorSensor));
     // mLiDAR.setDefaultCommand(new GetDistanceLiDAR());
     // aButton.whenPressed(new GetDistanceLiDAR());
+    mDrivetrain.setDefaultCommand(new GTADrive(oInterface::getRightTriggerAxis, oInterface::getLeftTriggerAxis, oInterface::getLeftXAxis, oInterface::getRightBumper));
+    aButton.whenPressed(new BallChase(()->(centerXSteer), ()->(isTargetFound)));
+    bButton.whenPressed(new GTADrive(oInterface::getRightTriggerAxis, oInterface::getLeftTriggerAxis, oInterface::getLeftXAxis, oInterface::getRightBumper));
   }
 
   private void setupNetworkTablesListeners() {
     NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
     NetworkTable nt = ntInst.getTable("limelight");
+
     nt.addEntryListener("tx", (table, key, entry, value, flags) -> {
-      centerXSteer = value.getDouble()*0.015;
-      System.out.println(centerXSteer);
+      centerXSteer = value.getDouble();
     }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    
+    // nt.addEntryListener("tv", (table, key, entry, value, flags) -> {
+    //   isTargetFound = value.getBoolean();
+    // }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
   }
   
   /**

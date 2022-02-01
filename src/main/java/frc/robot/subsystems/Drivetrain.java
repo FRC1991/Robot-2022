@@ -59,19 +59,15 @@ public class Drivetrain extends SubsystemBase {
         }
     }
 
-    public void setGTADrive(double speed, double rotation, boolean isQuickTurn){
-        differentialDrive.curvatureDrive(speed, rotation, isQuickTurn);
-    }
-
     public void arcadeDrive(double speed, double rotation){
         differentialDrive.arcadeDrive(speed, rotation);
     }
 
-    public void setGTADriveV2(double forwardSpeed, double backwardSpeed, double rotation, boolean isQuickTurn, double multiplier){
+    public void setGTADrive(double forwardSpeed, double backwardSpeed, double rotation, boolean isQuickTurn, double multiplier){
         forwardSpeed = multiplier*forwardSpeed;
         backwardSpeed = -1*multiplier*backwardSpeed;
         double netSpeed = forwardSpeed + backwardSpeed;
-        if(Math.abs(netSpeed)>DEADBAND){
+        if(Math.abs(netSpeed)>DEADBAND*multiplier){
             differentialDrive.curvatureDrive(netSpeed, multiplier*rotation, isQuickTurn);
         }
         else if(Math.abs(netSpeed)>0.01){
