@@ -17,9 +17,9 @@ public final class Constants {
     public final static int leftMotor2 = 4;
     public final static int rightMotor1 = 1;
     public final static int rightMotor2 = 2;
-    public final static double GTADriveMultiplier = 0.6;
+    public final static double GTADriveMultiplier = 0.4;
     public final static double tankDriveMultiplier = 2;
-    public final static double kPForVision = 0.85;
+    public final static double kPForVision = 0.89;
     public final static int proximitySensorDIOIndex = 2;
     public final static double globalDeadband = 0.1;
 }

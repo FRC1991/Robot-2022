@@ -61,12 +61,11 @@ public class RobotContainer {
     mDrivetrain.setDefaultCommand(standardGTADriveCommand);
     oInterface.getAButton().whenPressed(new BallChase(()->(centerXSteer), ()->(isTargetFound)));
     oInterface.getBButton().whenPressed(standardGTADriveCommand);
-  
   }
 
   private void visionInit() {
     NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
-    NetworkTable nt = ntInst.getTable("limelight");
+    NetworkTable nt = ntInst.getTable("limelight-balls");
 
     if(DriverStation.getAlliance().equals(Alliance.Red)){
       nt.getEntry("pipeline").setNumber(0);

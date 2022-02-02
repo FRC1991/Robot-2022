@@ -72,11 +72,16 @@ public class Drivetrain extends SubsystemBase {
         if(Math.abs(netSpeed)>deadband*multiplier){
             differentialDrive.curvatureDrive(netSpeed, multiplier*rotation, isQuickTurn);
         }
-        else if(Math.abs(netSpeed)>0.01){
+        else if(Math.abs(netSpeed)>0.01*multiplier){
             setDrivetrain(-rotation, rotation, multiplier);
         }
         else{
-            setDrivetrain(rotation, -rotation, multiplier);
+            if (isQuickTurn){
+            differentialDrive.curvatureDrive(0,  rotation*multiplier, true);
+            }
+            else{
+                differentialDrive.curvatureDrive(0,  rotation*multiplier*0.5, true);
+            }
         }
     }
 
