@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.commands.AimDrivetrain;
 import frc.robot.commands.BallChase;
 import frc.robot.commands.GTADrive;
 import frc.robot.subsystems.Drivetrain;
@@ -31,7 +32,7 @@ public class RobotContainer {
   public static Intake mIntake = new Intake();
   // public static ColorSensor mColorSensor = new ColorSensor();
   // public static LiDAR mLiDAR = new LiDAR();
-  public static double centerXSteer = 0;
+  public static double centerXSteer, drivetrainXSteer, yDistance = 0;
   public static boolean isTargetFound = false;
   private GTADrive standardGTADriveCommand = new GTADrive(oInterface::getRightTriggerAxis, oInterface::getLeftTriggerAxis, oInterface::getLeftXAxis, oInterface.getRightBumper()::get);
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -61,21 +62,35 @@ public class RobotContainer {
     mDrivetrain.setDefaultCommand(standardGTADriveCommand);
     oInterface.getAButton().whenPressed(new BallChase(()->(centerXSteer), ()->(isTargetFound)));
     oInterface.getBButton().whenPressed(standardGTADriveCommand);
+
+    oInterface.getRightBumper().whenPressed(new AimDrivetrain(()->(centerXSteer), ()->(yDistance)));
   }
 
   private void visionInit() {
     NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
-    NetworkTable nt = ntInst.getTable("limelight-balls");
+    NetworkTable fmsInfoNt = ntInst.getTable("FMSInfo");
+    NetworkTable ballNt = ntInst.getTable("limelight-balls");
+    NetworkTable shooterNt = ntInst.getTable("limelight-shooter");
 
-    if(DriverStation.getAlliance().equals(Alliance.Red)){
-      nt.getEntry("pipeline").setNumber(0);
-    }
-    else {
-      nt.getEntry("pipeline").setNumber(1);
-    }
+    fmsInfoNt.addEntryListener("IsRedAlliance", (table, key, entry, value, flags) -> {
+      if(value.getBoolean()){
+        ballNt.getEntry("pipeline").setNumber(0);
+      }
+      else{
+        ballNt.getEntry("pipeline").setNumber(1);
+      }
+    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal | EntryListenerFlags.kImmediate);
 
-    nt.addEntryListener("tx", (table, key, entry, value, flags) -> {
+    ballNt.addEntryListener("tx", (table, key, entry, value, flags) -> {
       centerXSteer = value.getDouble();
+    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+    shooterNt.addEntryListener("tx", (table, key, entry, value, flags) -> {
+      drivetrainXSteer = value.getDouble();
+    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+
+    shooterNt.addEntryListener("ty", (table, key, entry, value, flags) -> {
+      yDistance = value.getDouble();
     }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
 
     // nt.addEntryListener("tv", (table, key, entry, value, flags) -> {
