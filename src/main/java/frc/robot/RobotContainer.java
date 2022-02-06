@@ -4,19 +4,22 @@
 
 package frc.robot;
 
-import edu.wpi.first.networktables.EntryListenerFlags;
+import java.util.Map;
+
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.robot.commands.AimDrivetrain;
 import frc.robot.commands.BallChase;
 import frc.robot.commands.GTADrive;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -32,38 +35,34 @@ public class RobotContainer {
   public static Intake mIntake = new Intake();
   // public static ColorSensor mColorSensor = new ColorSensor();
   // public static LiDAR mLiDAR = new LiDAR();
-  public static double centerXSteer, drivetrainXSteer, yDistance = 0;
-  public static boolean isTargetFound = false;
-  private GTADrive standardGTADriveCommand = new GTADrive(oInterface::getRightTriggerAxis, oInterface::getLeftTriggerAxis, oInterface::getLeftXAxis, oInterface.getRightBumper()::get);
+  public static double centerXSteer, drivetrainXSteer, yDistance, maxSpeed = 0;
+  public static boolean isTargetFound, isChasingBall = false;
+  NetworkTableEntry isBallFoundEntry, maxSpeedEntry, isChasingBallEntry; 
+  
+  GTADrive standardGTADriveCommand = new GTADrive(oInterface::getRightTriggerAxis, oInterface::getLeftTriggerAxis, oInterface::getLeftXAxis, oInterface.getRightBumper()::get, ()->(maxSpeed));
+  BallChase standardBallChaseCommand = new BallChase(()->(centerXSteer), ()->(isTargetFound));
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    dashboardInit();
     visionInit();    
     configureButtonBindings();
   }
-
   
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
-  private void configureButtonBindings() {
-    // mDrivetrain.setDefaultCommand(new BallChase(()->(centerXSteer)));
-    // mDrivetrain.setDefaultCommand(new TankDrive());
-    // mDrivetrain.arcadeDrive(0.5, centerXSteer);
-    // GTADrive gtaDrive = new GTADrive();
-    // mDrivetrain.setDefaultCommand(gtaDrive);
-    // JoystickButton aButton = new JoystickButton(oInterface.driveJoystick, 1);
-    // aButton.whenPressed(new InstantCommand(()->{System.out.printf("Blue: %d, Red: %d, Green: %d\n", mColorSensor.getBlue(), mColorSensor.getRed(), mColorSensor.getGreen());}, mColorSensor));
-    // mLiDAR.setDefaultCommand(new GetDistanceLiDAR());
-    // aButton.whenPressed(new GetDistanceLiDAR());
-    
-    mDrivetrain.setDefaultCommand(standardGTADriveCommand);
-    oInterface.getAButton().whenPressed(new BallChase(()->(centerXSteer), ()->(isTargetFound)));
-    oInterface.getBButton().whenPressed(standardGTADriveCommand);
+  private void dashboardInit() {
 
-    oInterface.getRightBumper().whenPressed(new AimDrivetrain(()->(centerXSteer), ()->(yDistance)));
+    /**
+     * 
+     */
+    
+    
+    isChasingBallEntry = Shuffleboard.getTab("Main").add("Is Chasing Ball", isChasingBall).getEntry();
+    isBallFoundEntry = Shuffleboard.getTab("Main").add("Target Found", isTargetFound).getEntry();    
+    maxSpeedEntry = Shuffleboard.getTab("Main")
+    .add("Max Speed", Constants.GTADriveMultiplier)
+    .withWidget(BuiltInWidgets.kNumberSlider)
+    .withProperties(Map.of("min", 0, "max", 1))
+    .getEntry();
   }
 
   private void visionInit() {
@@ -79,24 +78,44 @@ public class RobotContainer {
       else{
         ballNt.getEntry("pipeline").setNumber(1);
       }
-    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal | EntryListenerFlags.kImmediate);
+    }, Constants.defaultFlags);
 
     ballNt.addEntryListener("tx", (table, key, entry, value, flags) -> {
       centerXSteer = value.getDouble();
-    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    }, Constants.defaultFlags);
+
+    ballNt.addEntryListener("tv", (table, key, entry, value, flags) -> {
+      isTargetFound = value.getDouble() == 1;
+      isBallFoundEntry.setBoolean(isTargetFound);
+      
+    }, Constants.defaultFlags);
 
     shooterNt.addEntryListener("tx", (table, key, entry, value, flags) -> {
       drivetrainXSteer = value.getDouble();
-    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    }, Constants.defaultFlags);
 
     shooterNt.addEntryListener("ty", (table, key, entry, value, flags) -> {
       yDistance = value.getDouble();
-    }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    }, Constants.defaultFlags);
 
-    // nt.addEntryListener("tv", (table, key, entry, value, flags) -> {
-    //   isTargetFound = value.getBoolean();
-    // }, EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    maxSpeedEntry.addListener((notification)->{
+      maxSpeed = notification.getEntry().getValue().getDouble();
+    }, Constants.defaultFlags);
+  }
 
+  /**
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   */
+  private void configureButtonBindings() {
+    
+
+    mDrivetrain.setDefaultCommand(standardGTADriveCommand);
+    oInterface.getAButton().whenPressed(standardBallChaseCommand);
+    oInterface.getBButton().whenPressed(standardGTADriveCommand);
+    oInterface.getLeftBumper().whenPressed(new AimDrivetrain(()->(centerXSteer), ()->(yDistance)));
   }
   
   /**

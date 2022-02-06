@@ -7,11 +7,12 @@ import frc.robot.Constants;
 import frc.robot.OperatingInterface;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Intake;
 
 public class AimDrivetrain extends CommandBase{
+
+    // TODO: Integerate target detection, ranging based on yDistance
+
     private Drivetrain drivetrain;
-    private Intake intake;
     private OperatingInterface oInterface = RobotContainer.oInterface;
     private final double minCommand = 0.25;
     private final double steeringScale = Constants.kPForVision;
@@ -21,7 +22,6 @@ public class AimDrivetrain extends CommandBase{
     
     public AimDrivetrain(Supplier<Double> xSteerSupplier, Supplier<Double> yDistanceSupplier) {
         drivetrain = RobotContainer.mDrivetrain;
-        intake = RobotContainer.mIntake;
         addRequirements(drivetrain);
         xSteer = xSteerSupplier;
         yDistance = yDistanceSupplier;

@@ -3,22 +3,21 @@ package frc.robot.commands;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
 
 public class GTADrive extends CommandBase {
 
     private final Drivetrain drivetrain;
-    private final double MULTIPLIER = Constants.GTADriveMultiplier;
-    private final  Supplier<Double> forwardSpeed, backwardSpeed, rotation;
+    private final  Supplier<Double> forwardSpeed, backwardSpeed, rotation, multiplier;
     private final Supplier<Boolean> isQuickTurn;
     
-    public GTADrive(Supplier<Double> forwardSpeedSupplier, Supplier<Double> backwardSpeedSupplier, Supplier<Double> rotationSupplier, Supplier<Boolean> isQuickTurnSupplier) {
+    public GTADrive(Supplier<Double> forwardSpeedSupplier, Supplier<Double> backwardSpeedSupplier, Supplier<Double> rotationSupplier, Supplier<Boolean> isQuickTurnSupplier, Supplier<Double> multiplierSupplier) {
         drivetrain = RobotContainer.mDrivetrain;
         forwardSpeed = forwardSpeedSupplier;
         backwardSpeed = backwardSpeedSupplier;
         rotation = rotationSupplier;
+        multiplier = multiplierSupplier;
         isQuickTurn = isQuickTurnSupplier;
         addRequirements(drivetrain);
     }
@@ -30,7 +29,7 @@ public class GTADrive extends CommandBase {
 
     @Override
     public void execute() {
-        drivetrain.setGTADrive(forwardSpeed.get(), backwardSpeed.get(), rotation.get(), isQuickTurn.get(), MULTIPLIER);
+        drivetrain.setGTADrive(forwardSpeed.get(), backwardSpeed.get(), rotation.get(), isQuickTurn.get(), multiplier.get());
     }
 
     @Override

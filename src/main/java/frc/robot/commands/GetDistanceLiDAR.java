@@ -2,13 +2,15 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.LiDAR;
 
 public class GetDistanceLiDAR extends CommandBase {
 
     private LiDAR mLiDAR;
+    private NetworkTableEntry distanceEntry;
 
     public GetDistanceLiDAR(LiDAR lidar) {
         mLiDAR = lidar;
@@ -17,12 +19,12 @@ public class GetDistanceLiDAR extends CommandBase {
 
     @Override
     public void initialize() {
+        distanceEntry = Shuffleboard.getTab("Main").add("LiDAR Distance (cm)", 0).getEntry();
     }
 
     @Override
     public void execute() {
-        // System.out.println(mLiDAR.getDistance());
-        SmartDashboard.putNumber("LiDAR Distance (cm)", mLiDAR.getDistance());
+        distanceEntry.setNumber(mLiDAR.getDistance());
     }
 
     @Override

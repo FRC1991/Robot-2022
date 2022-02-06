@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.EntryListenerFlags;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -22,4 +24,5 @@ public final class Constants {
     public final static double kPForVision = 0.89;
     public final static int proximitySensorDIOIndex = 2;
     public final static double globalDeadband = 0.1;
+    public static int defaultFlags = EntryListenerFlags.kNew | EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal | EntryListenerFlags.kImmediate;
 }
