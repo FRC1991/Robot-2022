@@ -1,4 +1,4 @@
-//TODO: Finish this
+// TODO: Finish this
 
 package frc.robot.commands;
 
@@ -9,33 +9,29 @@ import frc.robot.subsystems.LiDAR;
 
 public class GetDistanceLiDAR extends CommandBase {
 
-    private LiDAR mLiDAR;
-    private NetworkTableEntry distanceEntry;
+  private LiDAR mLiDAR;
+  private NetworkTableEntry distanceEntry;
 
-    public GetDistanceLiDAR(LiDAR lidar) {
-        mLiDAR = lidar;
-        addRequirements(mLiDAR);
-    }
+  public GetDistanceLiDAR(LiDAR lidar) {
+    mLiDAR = lidar;
+    addRequirements(mLiDAR);
+  }
 
-    @Override
-    public void initialize() {
-        distanceEntry = Shuffleboard.getTab("Main").add("LiDAR Distance (cm)", 0).getEntry();
-    }
+  @Override
+  public void initialize() {
+    distanceEntry = Shuffleboard.getTab("Main").add("LiDAR Distance (cm)", 0).getEntry();
+  }
 
-    @Override
-    public void execute() {
-        distanceEntry.setNumber(mLiDAR.getDistance());
-    }
+  @Override
+  public void execute() {
+    distanceEntry.setNumber(mLiDAR.getDistance());
+  }
 
-    @Override
-    public boolean isFinished() {
-        return false;
-    }
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
 
-    @Override
-    public void end(boolean interrupted) {
-    }
-
-    
-    
+  @Override
+  public void end(boolean interrupted) {}
 }

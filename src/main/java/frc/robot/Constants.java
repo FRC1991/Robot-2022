@@ -15,14 +15,18 @@ import edu.wpi.first.networktables.EntryListenerFlags;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public final static int leftMotor1 = 3;
-    public final static int leftMotor2 = 4;
-    public final static int rightMotor1 = 1;
-    public final static int rightMotor2 = 2;
-    public final static double GTADriveMultiplier = 0.4;
-    public final static double tankDriveMultiplier = 2;
-    public final static double kPForVision = 0.89;
-    public final static int proximitySensorDIOIndex = 2;
-    public final static double globalDeadband = 0.1;
-    public static int defaultFlags = EntryListenerFlags.kNew | EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal | EntryListenerFlags.kImmediate;
+  public static final int leftMotor1 = 3;
+  public static final int leftMotor2 = 4;
+  public static final int rightMotor1 = 1;
+  public static final int rightMotor2 = 2;
+  public static final double GTADriveMultiplier = 0.4;
+  public static final double tankDriveMultiplier = 2;
+  public static final double kPForVision = 0.89;
+  public static final int proximitySensorDIOIndex = 2;
+  public static final double globalDeadband = 0.1;
+  public static int defaultFlags =
+      EntryListenerFlags.kNew
+          | EntryListenerFlags.kUpdate
+          | EntryListenerFlags.kLocal
+          | EntryListenerFlags.kImmediate;
 }
