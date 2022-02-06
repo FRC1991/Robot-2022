@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 public class AimDrivetrain extends CommandBase {
 
   // TODO: Integerate target detection, ranging based on yDistance
+  // TODO: Convert to turret code once it's bulit
 
   private Drivetrain drivetrain;
   private OperatingInterface oInterface = RobotContainer.oInterface;
@@ -31,13 +32,12 @@ public class AimDrivetrain extends CommandBase {
 
   @Override
   public void execute() {
-    if (xSteer.get() > 1.0) {
+    // if target is off by more than 1 degree, adjust steering, otherwise, do nothing
+    // note that this is a very rough approximation, and may need to be adjusted
+    // multiplying by 0.015 to normalize the degree value to between -1 and 1
+    if ((xSteer.get() > 1.0) || (xSteer.get() < -1.0)) {
       steeringAdjust = xSteer.get() * 0.015;
       steeringAdjust = steeringAdjust + minCommand;
-      steeringAdjust = steeringAdjust * steeringScale;
-    } else if (xSteer.get() < -1.0) {
-      steeringAdjust = xSteer.get() * 0.015;
-      steeringAdjust = steeringAdjust - minCommand;
       steeringAdjust = steeringAdjust * steeringScale;
     } else {
       steeringAdjust = 0;
@@ -47,13 +47,13 @@ public class AimDrivetrain extends CommandBase {
 
   @Override
   public boolean isFinished() {
+    // if target is within 1 degree, finish command
     return xSteer.get() < 1.0;
   }
 
   @Override
   public void end(boolean interrupted) {
-    if (!interrupted) {
-      oInterface.doubleVibrate();
-    }
+    // let driver know they have control again
+    oInterface.doubleVibrate();
   }
 }

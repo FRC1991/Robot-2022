@@ -26,14 +26,12 @@ import java.util.Map;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+  // The robot's subsystems, commands, and global variables are defined here
 
   public static Drivetrain mDrivetrain = new Drivetrain();
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
-  // public static ColorSensor mColorSensor = new ColorSensor();
-  // public static LiDAR mLiDAR = new LiDAR();
-  public static double centerXSteer, drivetrainXSteer, yDistance, maxSpeed = 0;
+  public static double ballXError, drivetrainXSteer, yDistance, maxSpeed = 0;
   public static boolean isTargetFound, isChasingBall = false;
   NetworkTableEntry isBallFoundEntry, maxSpeedEntry, isChasingBallEntry;
 
@@ -44,21 +42,29 @@ public class RobotContainer {
           oInterface::getLeftXAxis,
           oInterface.getRightBumper()::get,
           () -> (maxSpeed));
-  BallChase standardBallChaseCommand = new BallChase(() -> (centerXSteer), () -> (isTargetFound));
+  BallChase standardBallChaseCommand = new BallChase(() -> (ballXError), () -> (isTargetFound));
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /** The container for the robot. Contains subsystems, OI devices, and commands. 
+   * Try to keep this as clean as possible, extract most of your code into functions.
+  */
   public RobotContainer() {
     dashboardInit();
     visionInit();
     configureButtonBindings();
   }
 
+  /** Add variables to shuffleboard
+   * 
+   * isChasingBallEntry determines if driver has control or not
+   * isBallFoundEntry is secondary confirmation for ball detection
+   * maxSpeedEntry is the limiter for GTADrive (falls back to value set in Constants.java)
+  */
   private void dashboardInit() {
-
-    /** */
     isChasingBallEntry =
         Shuffleboard.getTab("Main").add("Is Chasing Ball", isChasingBall).getEntry();
+
     isBallFoundEntry = Shuffleboard.getTab("Main").add("Target Found", isTargetFound).getEntry();
+
     maxSpeedEntry =
         Shuffleboard.getTab("Main")
             .add("Max Speed", Constants.GTADriveMultiplier)
@@ -67,12 +73,19 @@ public class RobotContainer {
             .getEntry();
   }
 
+  /*
+    * Mostly NT setup for now, could change later
+    */
   private void visionInit() {
+    // network tables setup
     NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
     NetworkTable fmsInfoNt = ntInst.getTable("FMSInfo");
     NetworkTable ballNt = ntInst.getTable("limelight-balls");
     NetworkTable shooterNt = ntInst.getTable("limelight-shooter");
 
+    // add entry listeners to update variables in code from network tables
+
+    // check what alliance color we're on and update limelight to track respective balls
     fmsInfoNt.addEntryListener(
         "IsRedAlliance",
         (table, key, entry, value, flags) -> {
@@ -84,10 +97,11 @@ public class RobotContainer {
         },
         Constants.defaultFlags);
 
+    // update ball information
     ballNt.addEntryListener(
         "tx",
         (table, key, entry, value, flags) -> {
-          centerXSteer = value.getDouble();
+          ballXError = value.getDouble();
         },
         Constants.defaultFlags);
 
@@ -99,6 +113,7 @@ public class RobotContainer {
         },
         Constants.defaultFlags);
 
+    // update shooter target information
     shooterNt.addEntryListener(
         "tx",
         (table, key, entry, value, flags) -> {
@@ -113,6 +128,7 @@ public class RobotContainer {
         },
         Constants.defaultFlags);
 
+    // update max speed from dashboard
     maxSpeedEntry.addListener(
         (notification) -> {
           maxSpeed = notification.getEntry().getValue().getDouble();
@@ -125,24 +141,30 @@ public class RobotContainer {
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * 
+   * A button: Chase ball
+   * B button: Cancel chase, returm to GTADrive
+   * Left Bumper: start aiming drivetrain
+   * TODO: Chainge left bumper to left trigger 
    */
   private void configureButtonBindings() {
-
     mDrivetrain.setDefaultCommand(standardGTADriveCommand);
     oInterface.getAButton().whenPressed(standardBallChaseCommand);
     oInterface.getBButton().whenPressed(standardGTADriveCommand);
     oInterface
         .getLeftBumper()
-        .whenPressed(new AimDrivetrain(() -> (centerXSteer), () -> (yDistance)));
+        .whenPressed(new AimDrivetrain(() -> (ballXError), () -> (yDistance)));
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
+   * 
+   * Will likely be some kind of Ramsette Command, but for now, leave it as is.
+   * TODO: add Ramsette command
+   * 
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
     return null;
   }
 }

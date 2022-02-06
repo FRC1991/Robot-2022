@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Drivetrain extends SubsystemBase {
-
   private boolean leftMotor1Inverted = false;
   private boolean leftMotor2Inverted = false;
   private boolean rightMotor1Inverted = true;
@@ -66,21 +65,21 @@ public class Drivetrain extends SubsystemBase {
       double rotation,
       boolean isQuickTurn,
       double multiplier) {
+
     forwardSpeed = multiplier * forwardSpeed;
     backwardSpeed = -1 * multiplier * backwardSpeed;
     double netSpeed = forwardSpeed + backwardSpeed;
+    
     if (Math.abs(netSpeed) > deadband * multiplier) {
       differentialDrive.curvatureDrive(netSpeed, multiplier * rotation, isQuickTurn);
     } else if (Math.abs(netSpeed) > 0.01 * multiplier) {
       setDrivetrain(-rotation, rotation, multiplier);
-    } else {
-      if (isQuickTurn) {
+    } else if(isQuickTurn){
         differentialDrive.curvatureDrive(0, rotation * multiplier, true);
       } else {
         differentialDrive.curvatureDrive(0, rotation * multiplier * 0.5, true);
       }
     }
-  }
 
   public void stopDrivetrain() {
     setDrivetrain(0, 0);
@@ -90,7 +89,6 @@ public class Drivetrain extends SubsystemBase {
     return leftMotor1.getEncoder().getPosition();
   }
 
-  // get encoder position of left motor 2
   public double getLeftMotor2Pos() {
     return leftMotor2.getEncoder().getPosition();
   }
@@ -99,7 +97,6 @@ public class Drivetrain extends SubsystemBase {
     return rightMotor1.getEncoder().getPosition();
   }
 
-  // get encoder position of right motor 2
   public double getRightMotor2Pos() {
     return rightMotor2.getEncoder().getPosition();
   }

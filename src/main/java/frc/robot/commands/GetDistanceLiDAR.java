@@ -19,11 +19,13 @@ public class GetDistanceLiDAR extends CommandBase {
 
   @Override
   public void initialize() {
+    // init shuffleboard entry
     distanceEntry = Shuffleboard.getTab("Main").add("LiDAR Distance (cm)", 0).getEntry();
   }
 
   @Override
   public void execute() {
+    // update entry with distance
     distanceEntry.setNumber(mLiDAR.getDistance());
   }
 
