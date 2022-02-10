@@ -69,17 +69,17 @@ public class Drivetrain extends SubsystemBase {
     forwardSpeed = multiplier * forwardSpeed;
     backwardSpeed = -1 * multiplier * backwardSpeed;
     double netSpeed = forwardSpeed + backwardSpeed;
-    
+
     if (Math.abs(netSpeed) > deadband * multiplier) {
       differentialDrive.curvatureDrive(netSpeed, multiplier * rotation, isQuickTurn);
     } else if (Math.abs(netSpeed) > 0.01 * multiplier) {
       setDrivetrain(-rotation, rotation, multiplier);
-    } else if(isQuickTurn){
-        differentialDrive.curvatureDrive(0, rotation * multiplier, true);
-      } else {
-        differentialDrive.curvatureDrive(0, rotation * multiplier * 0.5, true);
-      }
+    } else if (isQuickTurn) {
+      differentialDrive.curvatureDrive(0, rotation * multiplier, true);
+    } else {
+      differentialDrive.curvatureDrive(0, rotation * multiplier * 0.5, true);
     }
+  }
 
   public void stopDrivetrain() {
     setDrivetrain(0, 0);

@@ -19,9 +19,9 @@ public class BallChase extends CommandBase {
   private double steeringAdjust = 0;
   private Supplier<Double> xSteer;
   private Supplier<Boolean> isTargetFound;
-  
+
   // TODO: Integerate target detection
-  
+
   public BallChase(Supplier<Double> xSteerSupplier, Supplier<Boolean> isTargetFoundSupplier) {
     drivetrain = RobotContainer.mDrivetrain;
     intake = RobotContainer.mIntake;
@@ -31,7 +31,13 @@ public class BallChase extends CommandBase {
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+    NetworkTableInstance.getDefault()
+        .getTable("Shuffleboard")
+        .getSubTable("Main")
+        .getEntry("Is Chasing Ball")
+        .setBoolean(true);
+  }
 
   @Override
   public void execute() {
@@ -59,7 +65,8 @@ public class BallChase extends CommandBase {
     // let driver know they have control again and update network tables
     oInterface.doubleVibrate();
     NetworkTableInstance.getDefault()
-        .getTable("Main")
+        .getTable("Shuffleboard")
+        .getSubTable("Main")
         .getEntry("Is Chasing Ball")
         .setBoolean(false);
   }

@@ -6,9 +6,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LiDAR extends SubsystemBase {
 
-    /*
-    * Probably won't use, but it's here just in case
-    */
+  /*
+   * Probably won't use, but it's here just in case
+   */
 
   I2C lidarSensor;
 
@@ -23,10 +23,10 @@ public class LiDAR extends SubsystemBase {
     Timer.delay(0.01); // wait for measurement
 
     // read 2 bytes of data from sensor
-    lidarSensor.read(0x8f, 2, buffer); 
+    lidarSensor.read(0x8f, 2, buffer);
     int distanceInCm =
         (int) (Integer.toUnsignedLong(buffer[0] << 8) + Byte.toUnsignedInt(buffer[1]));
-    
+
     return distanceInCm / 2.54; // convert to inches
   }
 }
