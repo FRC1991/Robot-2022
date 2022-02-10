@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -15,8 +16,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.commands.AimDrivetrain;
 import frc.robot.commands.BallChase;
 import frc.robot.commands.GTADrive;
+import frc.robot.commands.SetShooterPID;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
 import java.util.Map;
 
 /**
@@ -31,9 +34,10 @@ public class RobotContainer {
   public static Drivetrain mDrivetrain = new Drivetrain();
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
-  public static double ballXError, drivetrainXSteer, yDistance, maxSpeed = 0;
+  public static Shooter mShooter = new Shooter();
+  public static double ballXError, drivetrainXSteer, yDistance, maxSpeed, shooterRPM = 0;
   public static boolean isTargetFound, isChasingBall = false;
-  NetworkTableEntry isBallFoundEntry, maxSpeedEntry, isChasingBallEntry;
+  NetworkTableEntry isBallFoundEntry, maxSpeedEntry, isChasingBallEntry, shooterRPMEntry;
 
   GTADrive standardGTADriveCommand =
       new GTADrive(
@@ -43,22 +47,25 @@ public class RobotContainer {
           oInterface.getRightBumper()::get,
           () -> (maxSpeed));
   BallChase standardBallChaseCommand = new BallChase(() -> (ballXError), () -> (isTargetFound));
+  SetShooterPID standarSetShooterPIDCommand = new SetShooterPID(() -> (shooterRPM));
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. 
-   * Try to keep this as clean as possible, extract most of your code into functions.
-  */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands. Try to keep this as
+   * clean as possible, extract most of your code into functions.
+   */
   public RobotContainer() {
     dashboardInit();
     visionInit();
     configureButtonBindings();
   }
 
-  /** Add variables to shuffleboard
-   * 
-   * isChasingBallEntry determines if driver has control or not
-   * isBallFoundEntry is secondary confirmation for ball detection
-   * maxSpeedEntry is the limiter for GTADrive (falls back to value set in Constants.java)
-  */
+  /**
+   * Add variables to shuffleboard
+   *
+   * <p>isChasingBallEntry determines if driver has control or not isBallFoundEntry is secondary
+   * confirmation for ball detection maxSpeedEntry is the limiter for GTADrive (falls back to value
+   * set in Constants.java)super secret secret(lets hope it saves)
+   */
   private void dashboardInit() {
     isChasingBallEntry =
         Shuffleboard.getTab("Main").add("Is Chasing Ball", isChasingBall).getEntry();
@@ -71,11 +78,20 @@ public class RobotContainer {
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", 0, "max", 1))
             .getEntry();
+    shooterRPMEntry =
+        Shuffleboard.getTab("Main")
+            .add("Shooter RPM", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 10000))
+            .getEntry();
+    HttpCamera limelightBallCamera =
+        new HttpCamera("limelight-balls-http", "http://10.19.91.69:5800");
+    Shuffleboard.getTab("Main").add(limelightBallCamera);
   }
 
   /*
-    * Mostly NT setup for now, could change later
-    */
+   * Mostly NT setup for now, could change later
+   */
   private void visionInit() {
     // network tables setup
     NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
@@ -134,6 +150,11 @@ public class RobotContainer {
           maxSpeed = notification.getEntry().getValue().getDouble();
         },
         Constants.defaultFlags);
+    shooterRPMEntry.addListener(
+        (notification) -> {
+          shooterRPM = notification.getEntry().getValue().getDouble();
+        },
+        Constants.defaultFlags);
   }
 
   /**
@@ -141,11 +162,9 @@ public class RobotContainer {
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   * 
-   * A button: Chase ball
-   * B button: Cancel chase, returm to GTADrive
-   * Left Bumper: start aiming drivetrain
-   * TODO: Chainge left bumper to left trigger 
+   *
+   * <p>A button: Chase ball B button: Cancel chase, returm to GTADrive Left Bumper: start aiming
+   * drivetrain TODO: Chainge left bumper to left trigger
    */
   private void configureButtonBindings() {
     mDrivetrain.setDefaultCommand(standardGTADriveCommand);
@@ -154,14 +173,15 @@ public class RobotContainer {
     oInterface
         .getLeftBumper()
         .whenPressed(new AimDrivetrain(() -> (ballXError), () -> (yDistance)));
+    oInterface.getXButton().whenPressed(standarSetShooterPIDCommand);
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   * 
-   * Will likely be some kind of Ramsette Command, but for now, leave it as is.
-   * TODO: add Ramsette command
-   * 
+   *
+   * <p>Will likely be some kind of Ramsette Command, but for now, leave it as is. TODO: add
+   * Ramsette command
+   *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {

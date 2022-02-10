@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-// hello
-
 package frc.robot;
 
 import edu.wpi.first.networktables.EntryListenerFlags;
@@ -21,6 +19,7 @@ public final class Constants {
   public static final int leftMotor2 = 4;
   public static final int rightMotor1 = 1;
   public static final int rightMotor2 = 2;
+  public static final int turretMotor = 6;
   public static final double GTADriveMultiplier = 0.4;
   public static final double tankDriveMultiplier = 2;
   public static final double kPForVision = 0.89;
@@ -31,5 +30,4 @@ public final class Constants {
           | EntryListenerFlags.kUpdate
           | EntryListenerFlags.kLocal
           | EntryListenerFlags.kImmediate;
-
 }

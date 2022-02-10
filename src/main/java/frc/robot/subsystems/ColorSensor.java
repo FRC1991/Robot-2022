@@ -7,8 +7,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class ColorSensor extends SubsystemBase {
 
   /*
-    * Probably won't use, but it's here just in case
-    */
+   * Probably won't use, but it's here just in case
+   */
 
   ColorSensorV3 sensor;
 
