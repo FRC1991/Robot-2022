@@ -22,7 +22,7 @@ public final class Constants {
   public static final int turretMotor = 6;
   public static final double GTADriveMultiplier = 0.4;
   public static final double tankDriveMultiplier = 2;
-  public static final double kPForVision = 0.89;
+  public static final double kPForVision = 2.3;
   public static final int proximitySensorDIOIndex = 2;
   public static final double globalDeadband = 0.1;
   public static int defaultFlags =

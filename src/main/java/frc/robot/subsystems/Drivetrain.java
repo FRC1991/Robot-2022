@@ -1,8 +1,10 @@
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -15,6 +17,8 @@ public class Drivetrain extends SubsystemBase {
   private double deadband = Constants.globalDeadband;
 
   private final CANSparkMax leftMotor1, leftMotor2, rightMotor1, rightMotor2;
+
+  private final AHRS navx;
 
   public Drivetrain() {
     // define motors with CAN IDs
@@ -30,8 +34,10 @@ public class Drivetrain extends SubsystemBase {
 
     leftMotor2.follow(leftMotor1);
     rightMotor2.follow(rightMotor1);
-
+    
     differentialDrive = new DifferentialDrive(leftMotor1, rightMotor1);
+    
+    navx = new AHRS();
   }
 
   public void setDrivetrain(double leftSpeed, double rightSpeed) {
@@ -107,4 +113,81 @@ public class Drivetrain extends SubsystemBase {
     rightMotor1.getEncoder().setPosition(0);
     rightMotor2.getEncoder().setPosition(0);
   }
+
+  public double getYaw() {
+    return navx.getYaw();
+  }
+
+  public double getPitch() {
+    return navx.getPitch();
+  }
+
+  public double getRoll() {
+    return navx.getRoll();
+  }
+
+  public double getCompassHeading() {
+    return navx.getFusedHeading();
+  }
+
+  public double getAngle() {
+    return navx.getAngle();
+  }
+
+  public double getDisplacementX() {
+    return navx.getDisplacementX();
+  }
+
+  public double getDisplacementY() {
+    return navx.getDisplacementY();
+  }
+
+  public double getDisplacementZ() {
+    return navx.getDisplacementZ();
+  }
+
+  public double getVelocityX() {
+    return navx.getVelocityX();
+  }
+
+  public double getVelocityY() {
+    return navx.getVelocityY();
+  }
+
+  public double getVelocityZ() {
+    return navx.getVelocityZ();
+  }
+
+  public double getAccelerationX() {
+    return navx.getWorldLinearAccelX();
+  }
+
+  public double getAccelerationY() {
+    return navx.getWorldLinearAccelY();
+  }
+
+  public double getAccelerationZ() {
+    return navx.getWorldLinearAccelZ();
+  }
+
+  @Override
+  public void periodic() {
+    // TODO Gyro Values Update
+    super.periodic();
+    // Shuffleboard.getTab("Main").add("NavX Yaw", getYaw());
+    // Shuffleboard.getTab("Main").add("NavX Pitch", getPitch());
+    // Shuffleboard.getTab("Main").add("NavX Roll", getRoll());
+    // Shuffleboard.getTab("Main").add("NavX Compass Heading", getCompassHeading());
+    // Shuffleboard.getTab("Main").add("NavX Angle", getAngle());
+    // Shuffleboard.getTab("Main").add("NavX Displacement X", getDisplacementX());
+    // Shuffleboard.getTab("Main").add("NavX Displacement Y", getDisplacementY());
+    // Shuffleboard.getTab("Main").add("NavX Displacement Z", getDisplacementZ());
+    // Shuffleboard.getTab("Main").add("NavX Velocity X", getVelocityX());
+    // Shuffleboard.getTab("Main").add("NavX Velocity Y", getVelocityY());
+    // Shuffleboard.getTab("Main").add("NavX Velocity Z", getVelocityZ());
+    // Shuffleboard.getTab("Main").add("NavX Acceleration X", getAccelerationX());
+    // Shuffleboard.getTab("Main").add("NavX Acceleration Y", getAccelerationY());
+    // Shuffleboard.getTab("Main").add("NavX Acceleration Z", getAccelerationZ());
+  }
+
 }

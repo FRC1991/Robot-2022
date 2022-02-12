@@ -14,7 +14,6 @@ public class BallChase extends CommandBase {
   private Drivetrain drivetrain;
   private Intake intake;
   private OperatingInterface oInterface = RobotContainer.oInterface;
-  private final double minCommand = 0.25;
   private final double steeringScale = Constants.kPForVision;
   private double steeringAdjust = 0;
   private Supplier<Double> xSteer;
@@ -44,14 +43,19 @@ public class BallChase extends CommandBase {
     // if target is off by more than 1 degree, adjust steering, otherwise, do nothing
     // note that this is a very rough approximation, and may need to be adjusted
     // multiplying by 0.015 to normalize the degree value to between -1 and 1
-    if (xSteer.get() > 1.0 || xSteer.get() < -1.0) {
+    System.out.println(xSteer.get());
+    if (xSteer.get() > 0.2) {
       steeringAdjust = xSteer.get() * 0.015;
-      steeringAdjust = steeringAdjust + minCommand;
       steeringAdjust = steeringAdjust * steeringScale;
-    } else {
+    } else if(xSteer.get() < -0.2){
+      steeringAdjust = xSteer.get() * 0.015;
+      steeringAdjust = steeringAdjust * steeringScale;
+    }
+    else {
       steeringAdjust = 0;
     }
-    drivetrain.arcadeDrive(0.8, steeringAdjust);
+    drivetrain.arcadeDrive(0.92, steeringAdjust);
+    System.out.println(steeringAdjust);
   }
 
   @Override
