@@ -35,9 +35,18 @@ public class RobotContainer {
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
   public static Shooter mShooter = new Shooter();
-  public static double ballXError, drivetrainXSteer, yDistance, maxSpeed, shooterRPM = 0;
+  public static double ballXError,
+      drivetrainXSteer,
+      yDistance,
+      maxSpeed,
+      shooterRPMFlywheel1,
+      shooterRPMFlywheel2 = 0;
   public static boolean isTargetFound, isChasingBall = false;
-  NetworkTableEntry isBallFoundEntry, maxSpeedEntry, isChasingBallEntry, shooterRPMEntry;
+  NetworkTableEntry isBallFoundEntry,
+      maxSpeedEntry,
+      isChasingBallEntry,
+      shooterRPMFlywheel1Entry,
+      shooterRPMFlywheel2Entry;
 
   GTADrive standardGTADriveCommand =
       new GTADrive(
@@ -47,7 +56,8 @@ public class RobotContainer {
           oInterface.getRightBumper()::get,
           () -> (maxSpeed));
   BallChase standardBallChaseCommand = new BallChase(() -> (ballXError), () -> (isTargetFound));
-  SetShooterPID standarSetShooterPIDCommand = new SetShooterPID(() -> (shooterRPM));
+  SetShooterPID standardSetShooterPIDCommand =
+      new SetShooterPID(() -> (shooterRPMFlywheel1), () -> (shooterRPMFlywheel2));
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands. Try to keep this as
@@ -78,12 +88,21 @@ public class RobotContainer {
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", 0, "max", 1))
             .getEntry();
-    shooterRPMEntry =
+    shooterRPMFlywheel1Entry =
         Shuffleboard.getTab("Main")
-            .add("Shooter RPM", 0)
+            .add("Shooter Flywheel 1 RPM", 0)
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", 0, "max", 10000))
             .getEntry();
+    shooterRPMFlywheel2Entry =
+        Shuffleboard.getTab("Main")
+            .add("Shooter Flywheel 2 RPM", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 10000))
+            .getEntry();
+
+    // does not work, not sure why
     HttpCamera limelightBallCamera =
         new HttpCamera("limelight-balls-http", "http://10.19.91.69:5800");
     Shuffleboard.getTab("Main").add(limelightBallCamera);
@@ -150,9 +169,14 @@ public class RobotContainer {
           maxSpeed = notification.getEntry().getValue().getDouble();
         },
         Constants.defaultFlags);
-    shooterRPMEntry.addListener(
+    shooterRPMFlywheel1Entry.addListener(
         (notification) -> {
-          shooterRPM = notification.getEntry().getValue().getDouble();
+          shooterRPMFlywheel1 = notification.getEntry().getValue().getDouble();
+        },
+        Constants.defaultFlags);
+    shooterRPMFlywheel2Entry.addListener(
+        (notification) -> {
+          shooterRPMFlywheel2 = notification.getEntry().getValue().getDouble();
         },
         Constants.defaultFlags);
   }
@@ -173,7 +197,7 @@ public class RobotContainer {
     oInterface
         .getLeftBumper()
         .whenPressed(new AimDrivetrain(() -> (ballXError), () -> (yDistance)));
-    oInterface.getXButton().whenPressed(standarSetShooterPIDCommand);
+    oInterface.getXButton().whenPressed(standardSetShooterPIDCommand);
   }
 
   /**
