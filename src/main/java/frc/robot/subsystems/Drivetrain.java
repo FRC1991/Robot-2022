@@ -4,7 +4,6 @@ import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -21,6 +20,9 @@ public class Drivetrain extends SubsystemBase {
   private final AHRS navx;
 
   public Drivetrain() {
+
+    navx = new AHRS();
+
     // define motors with CAN IDs
     leftMotor1 = new CANSparkMax(Constants.leftMotor1, MotorType.kBrushless);
     leftMotor2 = new CANSparkMax(Constants.leftMotor2, MotorType.kBrushless);
@@ -34,10 +36,8 @@ public class Drivetrain extends SubsystemBase {
 
     leftMotor2.follow(leftMotor1);
     rightMotor2.follow(rightMotor1);
-    
+
     differentialDrive = new DifferentialDrive(leftMotor1, rightMotor1);
-    
-    navx = new AHRS();
   }
 
   public void setDrivetrain(double leftSpeed, double rightSpeed) {
@@ -126,7 +126,7 @@ public class Drivetrain extends SubsystemBase {
     return navx.getRoll();
   }
 
-  public double getCompassHeading() {
+  public double getHeading() {
     return navx.getFusedHeading();
   }
 
@@ -170,24 +170,21 @@ public class Drivetrain extends SubsystemBase {
     return navx.getWorldLinearAccelZ();
   }
 
+  public double getDistanceFeet() {
+    double averageDistanceInRotations =
+        (leftMotor1.getEncoder().getPosition()
+                + leftMotor2.getEncoder().getPosition()
+                + rightMotor1.getEncoder().getPosition()
+                + rightMotor2.getEncoder().getPosition())
+            / 4.0;
+    double averageDistanceInRotationsOfOutputShaft = averageDistanceInRotations / 14.17;
+    return Math.PI
+        * averageDistanceInRotationsOfOutputShaft; // 6 in wheels, so circumfrence in ft is pi
+  }
+
   @Override
   public void periodic() {
     // TODO Gyro Values Update
     super.periodic();
-    // Shuffleboard.getTab("Main").add("NavX Yaw", getYaw());
-    // Shuffleboard.getTab("Main").add("NavX Pitch", getPitch());
-    // Shuffleboard.getTab("Main").add("NavX Roll", getRoll());
-    // Shuffleboard.getTab("Main").add("NavX Compass Heading", getCompassHeading());
-    // Shuffleboard.getTab("Main").add("NavX Angle", getAngle());
-    // Shuffleboard.getTab("Main").add("NavX Displacement X", getDisplacementX());
-    // Shuffleboard.getTab("Main").add("NavX Displacement Y", getDisplacementY());
-    // Shuffleboard.getTab("Main").add("NavX Displacement Z", getDisplacementZ());
-    // Shuffleboard.getTab("Main").add("NavX Velocity X", getVelocityX());
-    // Shuffleboard.getTab("Main").add("NavX Velocity Y", getVelocityY());
-    // Shuffleboard.getTab("Main").add("NavX Velocity Z", getVelocityZ());
-    // Shuffleboard.getTab("Main").add("NavX Acceleration X", getAccelerationX());
-    // Shuffleboard.getTab("Main").add("NavX Acceleration Y", getAccelerationY());
-    // Shuffleboard.getTab("Main").add("NavX Acceleration Z", getAccelerationZ());
   }
-
 }

@@ -47,11 +47,10 @@ public class BallChase extends CommandBase {
     if (xSteer.get() > 0.2) {
       steeringAdjust = xSteer.get() * 0.015;
       steeringAdjust = steeringAdjust * steeringScale;
-    } else if(xSteer.get() < -0.2){
+    } else if (xSteer.get() < -0.2) {
       steeringAdjust = xSteer.get() * 0.015;
       steeringAdjust = steeringAdjust * steeringScale;
-    }
-    else {
+    } else {
       steeringAdjust = 0;
     }
     drivetrain.arcadeDrive(0.92, steeringAdjust);

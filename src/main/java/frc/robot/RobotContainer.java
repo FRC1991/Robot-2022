@@ -13,9 +13,10 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.AimDrivetrain;
 import frc.robot.commands.BallChase;
+import frc.robot.commands.DriveDistance;
 import frc.robot.commands.GTADrive;
 import frc.robot.commands.SetShooterPID;
 import frc.robot.subsystems.Drivetrain;
@@ -210,6 +211,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;
+    return new SequentialCommandGroup(new DriveDistance(5, 0.5));
   }
 }
