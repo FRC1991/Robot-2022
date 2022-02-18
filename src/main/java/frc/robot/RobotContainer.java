@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.AimTurret;
 import frc.robot.commands.BallChase;
 import frc.robot.commands.DriveDistance;
+import frc.robot.commands.FollowPath;
 import frc.robot.commands.GTADrive;
 import frc.robot.commands.SetShooterPID;
 import frc.robot.subsystems.Drivetrain;
@@ -214,6 +215,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new SequentialCommandGroup(new DriveDistance(5, 0.5));
+    return new FollowPath();
   }
 }
