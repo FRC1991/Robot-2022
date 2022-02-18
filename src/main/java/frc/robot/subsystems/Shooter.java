@@ -7,33 +7,24 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
-  private final CANSparkMax turretMotor, flywheelMotor1, flywheelMotor2;
+  private final CANSparkMax flywheelMotor1, flywheelMotor2;
   private SparkMaxPIDController pidControllerFlywheel1, pidControllerFlywheel2;
-  public double kPFlywheel1,
-      kIFlywheel1,
-      kdFlywheel1,
-      kPFlywheel2,
-      kIFlywheel2,
-      kdFlywheel2,
-      kMaxOutput,
-      kMinOutput;
+  private final double kPFlywheel1 = Constants.kPFlywheel1;
+  private final double kIFlywheel1 = Constants.kIFlywheel1;
+  private final double kdFlywheel1 = Constants.kdFlywheel1;
+  private final double kPFlywheel2 = Constants.kdFlywheel2;
+  private final double kIFlywheel2 = Constants.kIFlywheel2;
+  private final double kdFlywheel2 = Constants.kdFlywheel2;
+  private final double kMaxOutput = Constants.kMaxOutput;
+  private final double kMinOutput = Constants.kMinOutput;
 
   public Shooter() {
-    turretMotor = new CANSparkMax(Constants.turretMotor, MotorType.kBrushless);
     flywheelMotor1 = new CANSparkMax(15, MotorType.kBrushless);
     flywheelMotor2 = new CANSparkMax(13, MotorType.kBrushless);
     flywheelMotor1.setInverted(true);
     flywheelMotor2.setInverted(false);
     pidControllerFlywheel1 = flywheelMotor1.getPIDController();
     pidControllerFlywheel2 = flywheelMotor2.getPIDController();
-    kPFlywheel1 = 0.00026666;
-    kIFlywheel1 = 0.000000632;
-    kdFlywheel1 = 0.00004;
-    kPFlywheel2 = 0.000013333;
-    kIFlywheel2 = 0.000000266;
-    kdFlywheel2 = 0;
-    kMaxOutput = 1;
-    kMinOutput = -1;
     pidControllerFlywheel1.setP(kPFlywheel1);
     pidControllerFlywheel1.setI(kIFlywheel1);
     pidControllerFlywheel1.setD(kdFlywheel1);
@@ -55,11 +46,6 @@ public class Shooter extends SubsystemBase {
 
   public double getVelovityFlywheel2() {
     return flywheelMotor2.getEncoder().getVelocity();
-  }
-
-  public void setTurret(double speed) {
-    // TODO: add turret turn degrees command
-    turretMotor.set(speed);
   }
 
   public void setFlywheel1(double speed) {

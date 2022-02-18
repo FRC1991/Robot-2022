@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.AimDrivetrain;
+import frc.robot.commands.AimTurret;
 import frc.robot.commands.BallChase;
 import frc.robot.commands.DriveDistance;
 import frc.robot.commands.GTADrive;
@@ -22,6 +22,8 @@ import frc.robot.commands.SetShooterPID;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
+
 import java.util.Map;
 
 /**
@@ -37,8 +39,9 @@ public class RobotContainer {
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
   public static Shooter mShooter = new Shooter();
+  public static Turret mTurret = new Turret();
   public static double ballXError,
-      drivetrainXSteer,
+      targetXSteer,
       yDistance,
       maxSpeed,
       shooterRPMFlywheel1,
@@ -154,7 +157,7 @@ public class RobotContainer {
     shooterNt.addEntryListener(
         "tx",
         (table, key, entry, value, flags) -> {
-          drivetrainXSteer = value.getDouble();
+          targetXSteer = value.getDouble();
         },
         Constants.defaultFlags);
 
@@ -198,7 +201,7 @@ public class RobotContainer {
     oInterface.getBButton().whenPressed(standardGTADriveCommand);
     oInterface
         .getLeftBumper()
-        .whenPressed(new AimDrivetrain(() -> (ballXError), () -> (yDistance)));
+        .whenPressed(new AimTurret(() -> (targetXSteer), () -> (yDistance)));
     oInterface.getXButton().whenPressed(standardSetShooterPIDCommand);
   }
 
