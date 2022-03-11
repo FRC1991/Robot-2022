@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.commands.AimTurret;
 import frc.robot.commands.AutoPath1;
 import frc.robot.commands.BackupAutoLong;
 import frc.robot.commands.BackupAutoShort;
@@ -31,6 +32,7 @@ import frc.robot.commands.RunIntakeForBall;
 import frc.robot.commands.SetShooterPID;
 import frc.robot.commands.ShiftToClimb;
 import frc.robot.commands.ShiftToDrive;
+import frc.robot.commands.ShootBall;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -276,6 +278,11 @@ public class RobotContainer {
     oInterface.getDriveRightBumper().whenPressed(new RunIntakeForBall());
     oInterface.getDriveYButton().whenPressed(new FeedBallToShooter());
     // oInterface.getDriveLeftBumper().whenPressed(new FeedBallToShooter().withTimeout(1));
+    oInterface.getAuxAButton().whenPressed(standardBallChaseCommand);
+    oInterface.getAuxBButton().whenPressed(standardGTADriveCommand);
+    oInterface.getAuxLeftBumper().whenPressed(new AimTurret(null, null));
+    oInterface.getAuxRightBumper().whenPressed(new ShootBall());
+    
   }
 
   /**
