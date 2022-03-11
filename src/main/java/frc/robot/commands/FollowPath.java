@@ -6,13 +6,13 @@ public class FollowPath extends SequentialCommandGroup {
   public FollowPath() {
     addCommands(
         new DriveDistance(3, 0.5),
-        new RotateGyro(90, -0.5),
+        new TurnGyro(90, -0.5),
         new DriveDistance(3, 0.5),
-        new RotateGyro(90, -0.5),
+        new TurnGyro(90, -0.5),
         new DriveDistance(3, 0.5),
-        new RotateGyro(90, 0.5),
+        new TurnGyro(90, 0.5),
         new DriveDistance(3, 0.5),
-        new RotateGyro(90, 0.5),
+        new TurnGyro(90, 0.5),
         new DriveDistance(3, 0.5));
   }
 }

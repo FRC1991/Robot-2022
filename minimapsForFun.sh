@@ -7,7 +7,7 @@
 
 for file in ./src/main/java/frc/**/*.java
 do
-minimap=/home/arya/.local/bin/minimap
+minimap=/home/arya/miniconda3/bin/minimap
 filename=$(basename $file .java)
 $minimap $file -s one-dark -o minimaps/$filename.png --overwrite
 done

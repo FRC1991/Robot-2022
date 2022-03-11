@@ -4,10 +4,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.OperatingInterface;
 import frc.robot.RobotContainer;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
-
 import java.util.function.Supplier;
 
 public class AimTurret extends CommandBase {
@@ -57,6 +54,6 @@ public class AimTurret extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     // let driver know they have control again
-    oInterface.doubleVibrate();
+    oInterface.doubleVibrateDrive();
   }
 }

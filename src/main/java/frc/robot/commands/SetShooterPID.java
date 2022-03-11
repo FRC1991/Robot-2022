@@ -12,22 +12,11 @@ public class SetShooterPID extends CommandBase {
 
   private Shooter mShooter = RobotContainer.mShooter;
   private Supplier<Double> rpmFlywheel1, rpmFlywheel2;
-  private NetworkTableEntry measuredRPMFlywheel1Entry, measuredRPMFlywheel2Entry;
 
   public SetShooterPID(Supplier<Double> rpmSupplier1, Supplier<Double> rpmSupplier2) {
     mShooter = RobotContainer.mShooter;
     rpmFlywheel1 = rpmSupplier1;
     rpmFlywheel2 = rpmSupplier2;
-    measuredRPMFlywheel1Entry =
-        Shuffleboard.getTab("Main")
-            .add("Flywheel 1 Measured RPM", 0)
-            .withWidget(BuiltInWidgets.kTextView)
-            .getEntry();
-    measuredRPMFlywheel2Entry =
-        Shuffleboard.getTab("Main")
-            .add("Flywheel 2 Measured RPM", 0)
-            .withWidget(BuiltInWidgets.kTextView)
-            .getEntry();
     addRequirements(mShooter);
   }
 
@@ -37,8 +26,8 @@ public class SetShooterPID extends CommandBase {
   @Override
   public void execute() {
     mShooter.setShooterPID(rpmFlywheel1.get(), rpmFlywheel2.get());
-    measuredRPMFlywheel1Entry.setNumber(mShooter.getVelocity());
-    measuredRPMFlywheel2Entry.setNumber(mShooter.getVelovityFlywheel2());
+    RobotContainer.measuredRPMFlywheel1Entry.setNumber(mShooter.getMainFlywheel1Velocity());
+    RobotContainer.measuredRPMFlywheel2Entry.setNumber(mShooter.getSecondaryFlywheelVelocity());
   }
 
   @Override
@@ -48,7 +37,8 @@ public class SetShooterPID extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    mShooter.setFlywheel1(0);
-    mShooter.setFlywheel2(0);
+    mShooter.setMainFlywheel1(0);
+    mShooter.setMainFlywheel2(0);
+    mShooter.setSecondaryFlywheel(0);
   }
 }

@@ -15,15 +15,24 @@ import edu.wpi.first.networktables.EntryListenerFlags;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-  public static final int leftMotor1 = 3;
-  public static final int leftMotor2 = 4;
+  public static final int leftMotor1 = 4;
+  public static final int leftMotor2 = 5;
+  public static final int leftMotor3 = 6;
   public static final int rightMotor1 = 1;
   public static final int rightMotor2 = 2;
-  public static final int turretMotor = 6;
-  public static final double GTADriveMultiplier = 0.4;
+  public static final int rightMotor3 = 3;
+  public static final int turretMotor = 7;
+  public static final int hoodMotor = 12;
+  public static final int intakeMotor1 = 13;
+  public static final int intakeMotor2 = 14;
+  public static final int mainFlywheelMotor1 = 9;
+  public static final int mainFlywheelMotor2 = 10;
+  public static final int secondaryFlywheel = 11;
+  public static final int elevatorRaiseMotor = 8;
+  public static final double GTADriveMultiplier = 0.8;
   public static final double tankDriveMultiplier = 2;
   public static final double kPForVision = 2.3;
-  public static final int proximitySensorDIOIndex = 2;
+  public static final int proximitySensorDIOIndex = 0;
   public static final double globalDeadband = 0.1;
   public static final double kPFlywheel1 = 0.00026666;
   public static final double kIFlywheel1 = 0.000000632;

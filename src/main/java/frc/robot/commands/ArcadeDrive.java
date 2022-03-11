@@ -24,7 +24,7 @@ public class ArcadeDrive extends CommandBase {
 
   @Override
   public void execute() {
-    drivetrain.arcadeDrive(oInterface.getLeftXAxis(), oInterface.getRightXAxis());
+    drivetrain.arcadeDrive(oInterface.getDriveLeftXAxis(), oInterface.getDriveRightYAxis());
   }
 
   @Override

@@ -66,7 +66,7 @@ public class BallChase extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     // let driver know they have control again and update network tables
-    oInterface.doubleVibrate();
+    oInterface.doubleVibrateDrive();
     NetworkTableInstance.getDefault()
         .getTable("Shuffleboard")
         .getSubTable("Main")

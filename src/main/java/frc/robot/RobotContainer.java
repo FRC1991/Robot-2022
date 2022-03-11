@@ -1,6 +1,7 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
+// does not work, not sure why, will not fix
 
 package frc.robot;
 
@@ -9,22 +10,31 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.AimTurret;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.commands.AutoPath1;
+import frc.robot.commands.BackupAutoLong;
+import frc.robot.commands.BackupAutoShort;
 import frc.robot.commands.BallChase;
-import frc.robot.commands.DriveDistance;
+import frc.robot.commands.FeedBallToShooter;
 import frc.robot.commands.FollowPath;
 import frc.robot.commands.GTADrive;
+import frc.robot.commands.RunIntakeForBall;
 import frc.robot.commands.SetShooterPID;
+import frc.robot.commands.ShiftToClimb;
+import frc.robot.commands.ShiftToDrive;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.Turret;
-
 import java.util.Map;
 
 /**
@@ -40,26 +50,33 @@ public class RobotContainer {
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
   public static Shooter mShooter = new Shooter();
-  public static Turret mTurret = new Turret();
+  // public static Turret mTurret = new Turret();
+  public static Turret mTurret = null;
   public static double ballXError,
       targetXSteer,
       yDistance,
       maxSpeed,
       shooterRPMFlywheel1,
-      shooterRPMFlywheel2 = 0;
+      shooterRPMFlywheel2,
+      hoodAngle = 0;
   public static boolean isTargetFound, isChasingBall = false;
   NetworkTableEntry isBallFoundEntry,
       maxSpeedEntry,
       isChasingBallEntry,
       shooterRPMFlywheel1Entry,
-      shooterRPMFlywheel2Entry;
+      shooterRPMFlywheel2Entry,
+      hoodAngleEntry;
+
+    public static NetworkTableEntry measuredRPMFlywheel1Entry, measuredRPMFlywheel2Entry;
+
+  SendableChooser autonomousChooser;
 
   GTADrive standardGTADriveCommand =
       new GTADrive(
-          oInterface::getRightTriggerAxis,
-          oInterface::getLeftTriggerAxis,
-          oInterface::getLeftXAxis,
-          oInterface.getRightBumper()::get,
+          oInterface::getDriveRightTriggerAxis,
+          oInterface::getDriveLeftTriggerAxis,
+          oInterface::getDriveLeftXAxis,
+          oInterface.getDriveRightBumper()::get,
           () -> (maxSpeed));
   BallChase standardBallChaseCommand = new BallChase(() -> (ballXError), () -> (isTargetFound));
   SetShooterPID standardSetShooterPIDCommand =
@@ -85,7 +102,6 @@ public class RobotContainer {
   private void dashboardInit() {
     isChasingBallEntry =
         Shuffleboard.getTab("Main").add("Is Chasing Ball", isChasingBall).getEntry();
-
     isBallFoundEntry = Shuffleboard.getTab("Main").add("Target Found", isTargetFound).getEntry();
 
     maxSpeedEntry =
@@ -98,20 +114,43 @@ public class RobotContainer {
         Shuffleboard.getTab("Main")
             .add("Shooter Flywheel 1 RPM", 0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0, "max", 10000))
+            .withProperties(Map.of("min", 0, "max", 6000))
             .getEntry();
     shooterRPMFlywheel2Entry =
         Shuffleboard.getTab("Main")
             .add("Shooter Flywheel 2 RPM", 0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0, "max", 10000))
+            .withProperties(Map.of("min", 0, "max", 20000))
             .getEntry();
 
-    // does not work, not sure why
-    HttpCamera limelightBallCamera =
-        new HttpCamera("limelight-balls-http", "http://10.19.91.69:5800");
-    Shuffleboard.getTab("Main").add(limelightBallCamera);
+    hoodAngleEntry =
+        Shuffleboard.getTab("Main")
+            .add("Hood Angle", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 55))
+            .getEntry();
+    measuredRPMFlywheel1Entry =
+    Shuffleboard.getTab("Main")
+        .add("Flywheel 1", 0)
+        .withWidget(BuiltInWidgets.kTextView)
+        .getEntry();
+    
+  measuredRPMFlywheel2Entry =
+  Shuffleboard.getTab("Main")
+      .add("Flywheel 2", 0)
+      .withWidget(BuiltInWidgets.kTextView)
+      .getEntry();
+
+    autonomousChooser = new SendableChooser<Command>();    
+    autonomousChooser.addOption("Backup Auto Short", new BackupAutoShort());
+    autonomousChooser.addOption("Backup Auto Long", new BackupAutoLong());
+    autonomousChooser.addOption("Complex Auto", new AutoPath1());
+    autonomousChooser.setDefaultOption("Backup Auto Long", new BackupAutoLong());
+    Shuffleboard.getTab("Main").add(autonomousChooser);
+    
+    // HttpCamera limelightBallCamera =
+    //     new HttpCamera("limelight-balls-http", "http://10.19.91.69:5800");
+    // Shuffleboard.getTab("Main").add(limelightBallCamera);
   }
 
   /*
@@ -185,6 +224,11 @@ public class RobotContainer {
           shooterRPMFlywheel2 = notification.getEntry().getValue().getDouble();
         },
         Constants.defaultFlags);
+    hoodAngleEntry.addListener(
+        (notification) -> {
+          hoodAngle = notification.getEntry().getValue().getDouble();
+        },
+        Constants.defaultFlags);
   }
 
   /**
@@ -196,14 +240,42 @@ public class RobotContainer {
    * <p>A button: Chase ball B button: Cancel chase, returm to GTADrive Left Bumper: start aiming
    * drivetrain TODO: Chainge left bumper to left trigger
    */
+
+
+   // 0.16 on right servo is drive
+  // 0.24 on right servo is climb
+  // 0.47 is for drive on left servo
+  // 0.39 is for climb on left servo
   private void configureButtonBindings() {
+    // oInterface.getDriveAButton().whenPressed(new InstantCommand(()->{
+      //   oInterface.doubleVibrateDrive();
+      // }, mDrivetrain));
+      // oInterface.getDriveBButton().whenPressed(new InstantCommand(()->{
+        //   oInterface.singleVibrateDrive();
+        // },mDrivetrain));
     mDrivetrain.setDefaultCommand(standardGTADriveCommand);
-    oInterface.getAButton().whenPressed(standardBallChaseCommand);
-    oInterface.getBButton().whenPressed(standardGTADriveCommand);
-    oInterface
-        .getLeftBumper()
-        .whenPressed(new AimTurret(() -> (targetXSteer), () -> (yDistance)));
-    oInterface.getXButton().whenPressed(standardSetShooterPIDCommand);
+    oInterface.getDriveSelectButton().whenPressed(new ShiftToClimb());
+    oInterface.getDriveStartButton().whenPressed(new ShiftToDrive());
+    // oInterface.getDriveStartButton().whileActiveContinuous(new RunCommand(()->{
+    //   System.out.println(mDrivetrain.getTransverseShaftEncoderPosition());
+    // }, mDrivetrain));
+    // oInterface.getDriveAButton().whenPressed(standardBallChaseCommand);
+    // oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
+    oInterface.getDriveXButton().whenPressed(standardSetShooterPIDCommand);
+    // mTurret.setDefaultCommand(
+    //     new RunCommand(
+    //         () -> {
+    //           mTurret.setTurret(oInterface.getDriveRightXAxis() * 0.05);
+    //           mTurret.setHood(oInterface.getDriveRightYAxis() * 0.2);
+    //           System.out.println(mTurret.getTurretPosition());
+    //         },
+    //         mTurret));
+    // mTurret.setDefaultCommand(new RunCommand(()->{
+    // System.out.println(mTurret.getTurretPosition());
+    // }, mTurret));
+    oInterface.getDriveRightBumper().whenPressed(new RunIntakeForBall());
+    oInterface.getDriveYButton().whenPressed(new FeedBallToShooter());
+    // oInterface.getDriveLeftBumper().whenPressed(new FeedBallToShooter().withTimeout(1));
   }
 
   /**
