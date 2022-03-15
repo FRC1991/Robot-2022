@@ -5,34 +5,27 @@
 
 package frc.robot;
 
-import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import frc.robot.commands.AimTurret;
 import frc.robot.commands.AutoPath1;
 import frc.robot.commands.BackupAutoLong;
 import frc.robot.commands.BackupAutoShort;
 import frc.robot.commands.BallChase;
 import frc.robot.commands.FeedBallToShooter;
-import frc.robot.commands.FollowPath;
 import frc.robot.commands.GTADrive;
 import frc.robot.commands.RunIntakeForBall;
+import frc.robot.commands.RunIntakeOutForBall;
 import frc.robot.commands.SetShooterPID;
 import frc.robot.commands.ShiftToClimb;
 import frc.robot.commands.ShiftToDrive;
-import frc.robot.commands.ShootBall;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -52,8 +45,7 @@ public class RobotContainer {
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
   public static Shooter mShooter = new Shooter();
-  // public static Turret mTurret = new Turret();
-  public static Turret mTurret = null;
+  public static Turret mTurret = new Turret();
   public static double ballXError,
       targetXSteer,
       yDistance,
@@ -61,15 +53,15 @@ public class RobotContainer {
       shooterRPMFlywheel1,
       shooterRPMFlywheel2,
       hoodAngle = 0;
-  public static boolean isTargetFound, isChasingBall = false;
+  public static boolean isBallFound, isChasingBall, isTargetFound = false;
   NetworkTableEntry isBallFoundEntry,
       maxSpeedEntry,
       isChasingBallEntry,
       shooterRPMFlywheel1Entry,
       shooterRPMFlywheel2Entry,
-      hoodAngleEntry;
-
-    public static NetworkTableEntry measuredRPMFlywheel1Entry, measuredRPMFlywheel2Entry;
+      hoodAngleEntry,
+      isTargetFoundEntry;
+  public static NetworkTableEntry measuredRPMFlywheel1Entry, measuredRPMFlywheel2Entry;
 
   SendableChooser autonomousChooser;
 
@@ -79,8 +71,9 @@ public class RobotContainer {
           oInterface::getDriveLeftTriggerAxis,
           oInterface::getDriveLeftXAxis,
           oInterface.getDriveRightBumper()::get,
-          () -> (maxSpeed));
-  BallChase standardBallChaseCommand = new BallChase(() -> (ballXError), () -> (isTargetFound));
+          () -> (maxSpeed),
+          oInterface.getDriveXButton()::get);
+  BallChase standardBallChaseCommand = new BallChase(() -> (ballXError), () -> (isBallFound));
   SetShooterPID standardSetShooterPIDCommand =
       new SetShooterPID(() -> (shooterRPMFlywheel1), () -> (shooterRPMFlywheel2));
 
@@ -102,9 +95,11 @@ public class RobotContainer {
    * set in Constants.java)super secret secret(lets hope it saves)
    */
   private void dashboardInit() {
-    isChasingBallEntry =
-        Shuffleboard.getTab("Main").add("Is Chasing Ball", isChasingBall).getEntry();
-    isBallFoundEntry = Shuffleboard.getTab("Main").add("Target Found", isTargetFound).getEntry();
+    isChasingBallEntry = Shuffleboard.getTab("Main").add("Chasing Ball", isChasingBall).getEntry();
+    isBallFoundEntry = Shuffleboard.getTab("Main").add("Ball Found", isBallFound).getEntry();
+
+    isTargetFoundEntry =
+        Shuffleboard.getTab("Main").add("Shot Target Found", isTargetFound).getEntry();
 
     maxSpeedEntry =
         Shuffleboard.getTab("Main")
@@ -125,31 +120,34 @@ public class RobotContainer {
             .withProperties(Map.of("min", 0, "max", 20000))
             .getEntry();
 
-    hoodAngleEntry =
-        Shuffleboard.getTab("Main")
-            .add("Hood Angle", 0)
-            .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0, "max", 55))
-            .getEntry();
+    // hoodAngleEntry =
+    // Shuffleboard.getTab("Main")
+    // .add("Hood Angle", 0)
+    // .withWidget(BuiltInWidgets.kNumberSlider)
+    // .withProperties(Map.of("min", 0, "max", 55))
+    // .getEntry();
     measuredRPMFlywheel1Entry =
-    Shuffleboard.getTab("Main")
-        .add("Flywheel 1", 0)
-        .withWidget(BuiltInWidgets.kTextView)
-        .getEntry();
-    
-  measuredRPMFlywheel2Entry =
-  Shuffleboard.getTab("Main")
-      .add("Flywheel 2", 0)
-      .withWidget(BuiltInWidgets.kTextView)
-      .getEntry();
+        Shuffleboard.getTab("Main")
+            .add("Flywheel 1", 0)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
 
-    autonomousChooser = new SendableChooser<Command>();    
-    autonomousChooser.addOption("Backup Auto Short", new BackupAutoShort());
-    autonomousChooser.addOption("Backup Auto Long", new BackupAutoLong());
+    measuredRPMFlywheel2Entry =
+        Shuffleboard.getTab("Main")
+            .add("Flywheel 2", 0)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+
+    autonomousChooser = new SendableChooser<Command>();
+    autonomousChooser.addOption(
+        "Backup Auto Short", new BackupAutoShort(() -> (targetXSteer), () -> (yDistance)));
+    autonomousChooser.addOption(
+        "Backup Auto Long", new BackupAutoLong(() -> (targetXSteer), () -> (yDistance)));
     autonomousChooser.addOption("Complex Auto", new AutoPath1());
-    autonomousChooser.setDefaultOption("Backup Auto Long", new BackupAutoLong());
+    autonomousChooser.setDefaultOption(
+        "Backup Auto Long", new BackupAutoLong(() -> (targetXSteer), () -> (yDistance)));
     Shuffleboard.getTab("Main").add(autonomousChooser);
-    
+
     // HttpCamera limelightBallCamera =
     //     new HttpCamera("limelight-balls-http", "http://10.19.91.69:5800");
     // Shuffleboard.getTab("Main").add(limelightBallCamera);
@@ -190,8 +188,8 @@ public class RobotContainer {
     ballNt.addEntryListener(
         "tv",
         (table, key, entry, value, flags) -> {
-          isTargetFound = value.getDouble() == 1;
-          isBallFoundEntry.setBoolean(isTargetFound);
+          isBallFound = value.getDouble() == 1;
+          isBallFoundEntry.setBoolean(isBallFound);
         },
         Constants.defaultFlags);
 
@@ -226,11 +224,11 @@ public class RobotContainer {
           shooterRPMFlywheel2 = notification.getEntry().getValue().getDouble();
         },
         Constants.defaultFlags);
-    hoodAngleEntry.addListener(
-        (notification) -> {
-          hoodAngle = notification.getEntry().getValue().getDouble();
-        },
-        Constants.defaultFlags);
+    // hoodAngleEntry.addListener(
+    //     (notification) -> {
+    //       hoodAngle = notification.getEntry().getValue().getDouble();
+    //     },
+    //     Constants.defaultFlags);
   }
 
   /**
@@ -243,46 +241,62 @@ public class RobotContainer {
    * drivetrain TODO: Chainge left bumper to left trigger
    */
 
-
-   // 0.16 on right servo is drive
+  // 0.16 on right servo is drive
   // 0.24 on right servo is climb
   // 0.47 is for drive on left servo
   // 0.39 is for climb on left servo
   private void configureButtonBindings() {
-    // oInterface.getDriveAButton().whenPressed(new InstantCommand(()->{
-      //   oInterface.doubleVibrateDrive();
-      // }, mDrivetrain));
-      // oInterface.getDriveBButton().whenPressed(new InstantCommand(()->{
-        //   oInterface.singleVibrateDrive();
-        // },mDrivetrain));
     mDrivetrain.setDefaultCommand(standardGTADriveCommand);
-    oInterface.getDriveSelectButton().whenPressed(new ShiftToClimb());
-    oInterface.getDriveStartButton().whenPressed(new ShiftToDrive());
-    // oInterface.getDriveStartButton().whileActiveContinuous(new RunCommand(()->{
-    //   System.out.println(mDrivetrain.getTransverseShaftEncoderPosition());
-    // }, mDrivetrain));
-    // oInterface.getDriveAButton().whenPressed(standardBallChaseCommand);
-    // oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
-    oInterface.getDriveXButton().whenPressed(standardSetShooterPIDCommand);
-    // mTurret.setDefaultCommand(
-    //     new RunCommand(
-    //         () -> {
-    //           mTurret.setTurret(oInterface.getDriveRightXAxis() * 0.05);
-    //           mTurret.setHood(oInterface.getDriveRightYAxis() * 0.2);
-    //           System.out.println(mTurret.getTurretPosition());
-    //         },
-    //         mTurret));
+    oInterface.getDriveSelectButton().whenPressed(new ShiftToClimb().withTimeout(4));
+    oInterface.getDriveStartButton().whenPressed(new ShiftToDrive().withTimeout(4));
+
+    oInterface.getDriveAButton().whenPressed(standardBallChaseCommand);
+    oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
+
+    // oInterface.getDriveXButton().whenPressed(standardSetShooterPIDCommand);
+
+    mTurret.setDefaultCommand(
+        new RunCommand(
+            () -> {
+              mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.1);
+              // mTurret.setHood(oInterface.getDriveRightYAxis() * 0.2);
+              // System.out.println(mTurret.getTurretPosition());
+            },
+            mTurret));
     // mTurret.setDefaultCommand(new RunCommand(()->{
     // System.out.println(mTurret.getTurretPosition());
     // }, mTurret));
-    oInterface.getDriveRightBumper().whenPressed(new RunIntakeForBall());
-    oInterface.getDriveYButton().whenPressed(new FeedBallToShooter());
-    // oInterface.getDriveLeftBumper().whenPressed(new FeedBallToShooter().withTimeout(1));
+
     oInterface.getAuxAButton().whenPressed(standardBallChaseCommand);
     oInterface.getAuxBButton().whenPressed(standardGTADriveCommand);
-    oInterface.getAuxLeftBumper().whenPressed(new AimTurret(null, null));
-    oInterface.getAuxRightBumper().whenPressed(new ShootBall());
-    
+    // oInterface.getAuxLeftBumper().whenPressed(new AimTurret(null, null));
+    // oInterface.getAuxRightBumper().whenPressed(new ShootBall());
+    // oInterface.getAuxLeftTriggerButton().whileActiveOnce(new AimDrivetrain(()->(targetXSteer),
+    // ()->(yDistance)));
+
+    // 8feet
+    // oInterface.getAuxRightTriggerButton().whileActiveOnce(new ShootBallForReal(()->(2750.),
+    // ()->(2000.)));
+
+    // oInterface.getAuxRightTriggerButton().whileActiveOnce(new ShootBallForReal(()->(2150.),
+    // ()->(2000.)));
+
+    // oInterface.getAuxRightTriggerButton().whileActiveOnce(new
+    // ShootBallForReal(()->((2150.)+(Math.abs(yDistance)*41.3)), ()->(2000.)));
+    oInterface.getAuxRightTriggerButton().whileActiveOnce(new FeedBallToShooter().withTimeout(0.5));
+
+    // oInterface.getAuxRightTriggerButton().whileActiveOnce(new
+    // ShootBallForReal(()->(shooterRPMFlywheel1), ()->(shooterRPMFlywheel2)));
+
+    mShooter.setDefaultCommand(
+        new SetShooterPID(() -> ((2150.) + (Math.abs(yDistance) * 41.3)), () -> (2000.)));
+
+    // oInterface.getAuxRightTriggerButton().whileActiveOnce(new ShootBallForReal(()->(3700.),
+    // ()->(0.)));
+    oInterface.getAuxLeftStickDownButton().whileActiveContinuous(new RunIntakeForBall());
+    oInterface.getAuxLeftStickUpButton().whileActiveContinuous(new RunIntakeOutForBall());
+    oInterface.getAuxRightStickUpButton().whileActiveContinuous(new RunIntakeOutForBall());
+    oInterface.getAuxRightStickDownButton().whileActiveContinuous(new RunIntakeOutForBall());
   }
 
   /**
@@ -294,6 +308,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new FollowPath();
+    return new BackupAutoShort(() -> (targetXSteer), () -> (yDistance));
   }
 }

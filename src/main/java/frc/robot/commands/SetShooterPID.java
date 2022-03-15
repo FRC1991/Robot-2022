@@ -1,8 +1,5 @@
 package frc.robot.commands;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Shooter;
@@ -37,8 +34,8 @@ public class SetShooterPID extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    mShooter.setMainFlywheel1(0);
-    mShooter.setMainFlywheel2(0);
-    mShooter.setSecondaryFlywheel(0);
+    // mShooter.setMainFlywheel1(0);
+    // mShooter.setMainFlywheel2(0);
+    // mShooter.setSecondaryFlywheel(0);
   }
 }

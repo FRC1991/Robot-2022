@@ -25,8 +25,7 @@ public class OperatingInterface {
       rightBumperAux,
       selectButtonAux,
       startButtonAux;
-  
-      private Button dPadUpDriveButton,
+  private Button dPadUpDriveButton,
       dPadDownDriveButton,
       dPadLeftDriveButton,
       dPadRightDriveButton,
@@ -109,8 +108,9 @@ public class OperatingInterface {
     return driveJoystick.getRawAxis(1);
   }
 
+  // only for waterbury
   public double getDriveLeftXAxis() {
-    return driveJoystick.getRawAxis(0);
+    return -driveJoystick.getRawAxis(0);
   }
 
   public double getDriveRightYAxis() {
@@ -189,11 +189,11 @@ public class OperatingInterface {
     return rightStickDownDriveButton;
   }
 
-  public Button getDriveRightStickLeftButton(){
+  public Button getDriveRightStickLeftButton() {
     return rightStickLeftDriveButton;
   }
 
-  public Button getDriveRightStickRightButton(){
+  public Button getDriveRightStickRightButton() {
     return rightStickRightDriveButton;
   }
 
@@ -205,11 +205,11 @@ public class OperatingInterface {
     return leftStickDownDriveButton;
   }
 
-  public Button getDriveLeftStickLeftButton(){
+  public Button getDriveLeftStickLeftButton() {
     return leftStickLeftDriveButton;
   }
 
-  public Button getDriveLeftStickRightButton(){
+  public Button getDriveLeftStickRightButton() {
     return leftStickRightDriveButton;
   }
 
@@ -222,7 +222,7 @@ public class OperatingInterface {
   }
 
   public void doubleVibrateDrive() {
-    for(int i=0; i<2; i++){
+    for (int i = 0; i < 2; i++) {
       driveJoystick.setRumble(RumbleType.kLeftRumble, 1);
       Timer.delay(0.2);
       driveJoystick.setRumble(RumbleType.kLeftRumble, 0);
@@ -234,6 +234,30 @@ public class OperatingInterface {
     driveJoystick.setRumble(RumbleType.kLeftRumble, 1);
     Timer.delay(0.25);
     driveJoystick.setRumble(RumbleType.kLeftRumble, 0);
+  }
+
+  public double getAuxLeftYAxis() {
+    return auxJoystick.getRawAxis(1);
+  }
+
+  public double getAuxLeftXAxis() {
+    return auxJoystick.getRawAxis(0);
+  }
+
+  public double getAuxRightYAxis() {
+    return auxJoystick.getRawAxis(5);
+  }
+
+  public double getAuxRightXAxis() {
+    return auxJoystick.getRawAxis(4);
+  }
+
+  public double getAuxRightTriggerAxis() {
+    return auxJoystick.getRawAxis(3);
+  }
+
+  public double getAuxLeftTriggerAxis() {
+    return auxJoystick.getRawAxis(2);
   }
 
   public JoystickButton getAuxAButton() {
@@ -292,11 +316,11 @@ public class OperatingInterface {
     return rightStickDownAuxButton;
   }
 
-  public Button getAuxRightStickLeftButton(){
+  public Button getAuxRightStickLeftButton() {
     return rightStickLeftAuxButton;
   }
 
-  public Button getAuxRightStickRightButton(){
+  public Button getAuxRightStickRightButton() {
     return rightStickRightAuxButton;
   }
 
@@ -308,11 +332,11 @@ public class OperatingInterface {
     return leftStickDownAuxButton;
   }
 
-  public Button getAuxLeftStickLeftButton(){
+  public Button getAuxLeftStickLeftButton() {
     return leftStickLeftAuxButton;
   }
 
-  public Button getAuxLeftStickRightButton(){
+  public Button getAuxLeftStickRightButton() {
     return leftStickRightAuxButton;
   }
 
@@ -324,11 +348,16 @@ public class OperatingInterface {
     return rightTriggerAuxButton;
   }
 
-
   public void doubleVibrateAux() {
     auxJoystick.setRumble(RumbleType.kLeftRumble, 1);
     Timer.delay(0.2);
     auxJoystick.setRumble(RumbleType.kLeftRumble, 0);
     Timer.delay(0.1);
+  }
+
+  public void singleVibrateAux() {
+    auxJoystick.setRumble(RumbleType.kLeftRumble, 1);
+    Timer.delay(0.25);
+    auxJoystick.setRumble(RumbleType.kLeftRumble, 0);
   }
 }

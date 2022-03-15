@@ -19,10 +19,10 @@ public class Turret extends SubsystemBase {
     hoodMotor.setSoftLimit(SoftLimitDirection.kReverse, 0);
     hoodMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
     hoodMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
-    turretMotor.setSoftLimit(SoftLimitDirection.kForward, 14);
-    turretMotor.setSoftLimit(SoftLimitDirection.kReverse, -14);
-    turretMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
-    turretMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
+    // turretMotor.setSoftLimit(SoftLimitDirection.kForward, 14);
+    // turretMotor.setSoftLimit(SoftLimitDirection.kReverse, -14);
+    // turretMotor.enableSoftLimit(SoftLimitDirection.kForward, true);
+    // turretMotor.enableSoftLimit(SoftLimitDirection.kReverse, true);
   }
 
   public void setTurret(double speed) {

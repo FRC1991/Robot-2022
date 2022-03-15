@@ -15,6 +15,8 @@ public class Intake extends SubsystemBase {
     proximitySensor = new DigitalInput(Constants.proximitySensorDIOIndex);
     intakeMotor1 = new CANSparkMax(Constants.intakeMotor1, MotorType.kBrushless);
     intakeMotor2 = new CANSparkMax(Constants.intakeMotor2, MotorType.kBrushless);
+    intakeMotor1.setInverted(true);
+    intakeMotor2.setInverted(true);
   }
 
   public void setIntakeMotor1(double speed) {

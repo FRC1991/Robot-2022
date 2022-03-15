@@ -16,18 +16,18 @@ public class AutoPath1 extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      new DriveDistance(2.66,0.5),
-      new BallChase(()->(RobotContainer.ballXError), ()->(RobotContainer.isChasingBall)),
-      // INSERT SHOOT AND AIM COMMAND HERE
-      new TurnGyro(56, 0.5),
-      new DriveDistance(7.75, 0.5),
-      new BallChase(()->(RobotContainer.ballXError), ()->(RobotContainer.isChasingBall)),
-      // INSERT SHOOT AND AIM COMMAND HERE
-      new DriveDistance(5.33, 0.5),
-      new TurnGyro(117, 0.5),
-      new DriveDistance(9.25, 0.5),
-      new BallChase(()->(RobotContainer.ballXError), ()->(RobotContainer.isChasingBall))
-      // INSERT SHOOT AND AIM COMMAND HERE
-    );
+        new DriveDistance(2.66, 0.5),
+        new BallChase(() -> (RobotContainer.ballXError), () -> (RobotContainer.isChasingBall)),
+        // INSERT SHOOT AND AIM COMMAND HERE
+        new TurnGyro(56, 0.5),
+        new DriveDistance(7.75, 0.5),
+        new BallChase(() -> (RobotContainer.ballXError), () -> (RobotContainer.isChasingBall)),
+        // INSERT SHOOT AND AIM COMMAND HERE
+        new DriveDistance(5.33, 0.5),
+        new TurnGyro(117, 0.5),
+        new DriveDistance(9.25, 0.5),
+        new BallChase(() -> (RobotContainer.ballXError), () -> (RobotContainer.isChasingBall))
+        // INSERT SHOOT AND AIM COMMAND HERE
+        );
   }
 }

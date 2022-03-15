@@ -6,7 +6,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
 
@@ -15,7 +14,7 @@ public class ShiftToDrive extends CommandBase {
   Drivetrain drivetrain;
   double initialPosition;
   double startTime, currentTime;
-  
+
   /** Creates a new StartClimb. */
   public ShiftToDrive() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -28,7 +27,6 @@ public class ShiftToDrive extends CommandBase {
   public void initialize() {
     drivetrain.setServos(0.47, 0.16);
     initialPosition = drivetrain.getDistanceFeet();
-
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -38,18 +36,18 @@ public class ShiftToDrive extends CommandBase {
     // drivetrain.setServos(0.455, 0.145);
     // if(Timer.getFPGATimestamp() - startTime >= 0.2){
     //   drivetrain.setDrivetrain(-0.15, -0.15);
-    //   System.out.printf("Init: %f   Cur: %f\n", initialPosition, drivetrain.getTransverseShaftEncoderPosition());
+    //   System.out.printf("Init: %f   Cur: %f\n", initialPosition,
+    // drivetrain.getTransverseShaftEncoderPosition());
     //   drivetrain.setServos(0.47, 0.16);
     // }
-
 
     drivetrain.setServos(0.455, 0.145);
     Timer.delay(0.2);
     drivetrain.setDrivetrain(-0.15, -0.15);
-    System.out.printf("Init: %f   Cur: %f\n", initialPosition, drivetrain.getTransverseShaftEncoderPosition());
+    // System.out.printf("Init: %f   Cur: %f\n", initialPosition,
+    // drivetrain.getTransverseShaftEncoderPosition());
     drivetrain.setServos(0.47, 0.16);
     Timer.delay(0.2);
-
   }
 
   @Override

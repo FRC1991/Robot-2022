@@ -4,6 +4,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.OperatingInterface;
@@ -15,7 +16,7 @@ public class ShiftToClimb extends CommandBase {
   Drivetrain drivetrain;
   double initialPosition;
   OperatingInterface oInterface;
-  
+
   /** Creates a new StartClimb. */
   public ShiftToClimb() {
     // Use addRequirements() here to declare subsystem dependencies.
@@ -29,6 +30,11 @@ public class ShiftToClimb extends CommandBase {
   public void initialize() {
     drivetrain.setServos(0.39, 0.225);
     initialPosition = drivetrain.getTransverseShaftEncoderPosition();
+    NetworkTableInstance.getDefault()
+        .getTable("Shuffleboard")
+        .getSubTable("Main")
+        .getEntry("Max Speed")
+        .setNumber(0.4);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -37,10 +43,10 @@ public class ShiftToClimb extends CommandBase {
     drivetrain.setServos(0.375, 0.21);
     Timer.delay(0.2);
     drivetrain.setDrivetrain(-0.15, -0.15);
-    System.out.printf("Init: %f   Cur: %f\n", initialPosition, drivetrain.getTransverseShaftEncoderPosition());
+    System.out.printf(
+        "Init: %f   Cur: %f\n", initialPosition, drivetrain.getTransverseShaftEncoderPosition());
     drivetrain.setServos(0.39, 0.225);
     Timer.delay(0.2);
-
   }
 
   @Override
@@ -51,7 +57,13 @@ public class ShiftToClimb extends CommandBase {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    oInterface.doubleVibrateDrive();
     drivetrain.setDrivetrain(0, 0);
+    NetworkTableInstance.getDefault()
+        .getTable("Shuffleboard")
+        .getSubTable("Main")
+        .getEntry("Max Speed")
+        .setNumber(0.8);
   }
 
   // Returns true when the command should end.

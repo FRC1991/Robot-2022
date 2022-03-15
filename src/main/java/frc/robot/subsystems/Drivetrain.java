@@ -2,17 +2,16 @@ package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.SparkMaxAlternateEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
+import com.revrobotics.SparkMaxAlternateEncoder;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Drivetrain extends SubsystemBase {
-  private boolean leftMotorInverted = true;
-  private boolean rightMotorInverted = false;
+  private boolean leftMotorInverted = false;
+  private boolean rightMotorInverted = true;
   private DifferentialDrive differentialDrive;
   private double deadband = Constants.globalDeadband;
 
@@ -22,7 +21,6 @@ public class Drivetrain extends SubsystemBase {
       rightMotor1,
       rightMotor2,
       rightMotor3;
-
   private Servo leftServo, rightServo;
 
   private final AHRS navx;
@@ -201,13 +199,15 @@ public class Drivetrain extends SubsystemBase {
         * averageDistanceInRotationsOfOutputShaft; // 6 in wheels, so circumfrence in ft is pi
   }
 
-  public void setServos(double leftServoPosition, double rightServoPosition){
-      leftServo.set(leftServoPosition);
-      rightServo.set(rightServoPosition);
+  public void setServos(double leftServoPosition, double rightServoPosition) {
+    leftServo.set(leftServoPosition);
+    rightServo.set(rightServoPosition);
   }
 
-  public double getTransverseShaftEncoderPosition(){
-    return rightMotor1.getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192).getPosition();
+  public double getTransverseShaftEncoderPosition() {
+    return rightMotor1
+        .getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192)
+        .getPosition();
   }
 
   @Override

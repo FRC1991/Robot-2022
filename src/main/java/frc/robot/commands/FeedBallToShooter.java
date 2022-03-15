@@ -17,8 +17,8 @@ public class FeedBallToShooter extends CommandBase {
 
   @Override
   public void execute() {
-    intake.setIntakeMotor1(-0.5);
-    intake.setIntakeMotor2(-0.8);
+    intake.setIntakeMotor1(0.5);
+    intake.setIntakeMotor2(0.8);
   }
 
   @Override

@@ -4,17 +4,13 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import java.util.function.Supplier;
 
-public class ShootBall extends SequentialCommandGroup {
-  /** Creates a new ShootBall. */
-  public ShootBall() {
-    // Add your commands in the addCommands() call, e.g.
-    // addCommands(new FooCommand(), new BarCommand());
+public class ShootBall extends ParallelRaceGroup {
+  public ShootBall(Supplier<Double> mainFlywheelSpeed, Supplier<Double> secondaryFlywheelSpeed) {
     addCommands(
-      new FeedBallToShooter()
-      // new SetShooterPID(()->(0.), ()->(0.)).withTimeout(3),
-      // new SetShooterPID(()->(0.), ()->(0.))
-    );
+        new SetShooterPID(mainFlywheelSpeed, secondaryFlywheelSpeed).withTimeout(1.5),
+        new FeedBallToShooter().withTimeout(0.5));
   }
 }
