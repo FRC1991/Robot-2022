@@ -26,12 +26,10 @@ public class Turret extends SubsystemBase {
   }
 
   public void setTurret(double speed) {
-    // TODO: add turret turn degrees command
     turretMotor.set(speed);
   }
 
   public void setHood(double speed) {
-    // TODO: add hood set degrees command
     hoodMotor.set(speed);
   }
 

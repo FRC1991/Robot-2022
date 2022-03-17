@@ -212,7 +212,6 @@ public class Drivetrain extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // TODO Gyro Values Update
     super.periodic();
   }
 }

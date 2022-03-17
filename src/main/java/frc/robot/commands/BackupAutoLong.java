@@ -8,7 +8,7 @@ public class BackupAutoLong extends SequentialCommandGroup {
   public BackupAutoLong(Supplier<Double> xSteerSupplier, Supplier<Double> yDistanceSupplier) {
     addCommands(
         new DriveDistance(5.4, -0.9),
-        new BallChase(() -> (RobotContainer.ballXError), () -> (RobotContainer.isChasingBall))
+        new BallChase(() -> (RobotContainer.ballXError))
         // new AimTurret(xSteerSupplier, yDistanceSupplier)
         // new ShootBall(3750, 2500)
         );

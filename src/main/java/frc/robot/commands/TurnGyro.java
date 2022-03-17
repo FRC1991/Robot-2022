@@ -24,7 +24,6 @@ public class TurnGyro extends CommandBase {
 
   @Override
   public void execute() {
-    // TODO: make drivetrain turn
     currentAngle = mDrivetrain.getHeading();
     mDrivetrain.arcadeDrive(0, turnSpeed);
   }
@@ -36,7 +35,6 @@ public class TurnGyro extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    // TODO Auto-generated method stub
     mDrivetrain.arcadeDrive(0, 0);
   }
 }

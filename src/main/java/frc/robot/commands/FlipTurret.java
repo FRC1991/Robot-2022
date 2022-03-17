@@ -43,7 +43,6 @@ public class FlipTurret extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    // TODO Auto-generated method stub
     // 60 revolutions of the neo 550 is one rotation of the entire turret assembly
     return Math.abs(initialPosition - currentPosition) >= 60;
   }

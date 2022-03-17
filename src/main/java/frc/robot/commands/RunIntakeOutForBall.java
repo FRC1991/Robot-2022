@@ -26,7 +26,7 @@ public class RunIntakeOutForBall extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.setIntakeMotor1(0.8);
+    intake.setIntakeMotor1(-0.8);
     System.out.println(RobotContainer.oInterface.getAuxLeftStickUpButton().get());
   }
 

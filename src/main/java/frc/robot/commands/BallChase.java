@@ -17,14 +17,10 @@ public class BallChase extends CommandBase {
   private final double steeringScale = Constants.kPForVision;
   private double steeringAdjust = 0;
   private Supplier<Double> xSteer;
-  private Supplier<Boolean> isTargetFound;
 
-  // TODO: Integerate target detection
-
-  public BallChase(Supplier<Double> xSteerSupplier, Supplier<Boolean> isTargetFoundSupplier) {
+  public BallChase(Supplier<Double> xSteerSupplier) {
     drivetrain = RobotContainer.mDrivetrain;
     intake = RobotContainer.mIntake;
-    isTargetFound = isTargetFoundSupplier;
     addRequirements(drivetrain);
     xSteer = xSteerSupplier;
   }
@@ -54,7 +50,7 @@ public class BallChase extends CommandBase {
     } else {
       steeringAdjust = 0;
     }
-    drivetrain.arcadeDrive(0, -steeringAdjust);
+    drivetrain.arcadeDrive(-1, -steeringAdjust);
     System.out.println("Ball Chase Output to Drive " + steeringAdjust);
 
     intake.setIntakeMotor1(-0.5);

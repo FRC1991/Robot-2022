@@ -2,28 +2,22 @@ package frc.robot.commands;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.OperatingInterface;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Turret;
 import java.util.function.Supplier;
 
 public class AimTurret extends CommandBase {
 
-  // TODO: Integerate target detection, ranging based on yDistance
-
   private Turret turret;
-  private OperatingInterface oInterface = RobotContainer.oInterface;
   private final double minCommand = 0.05;
   private final double steeringScale = 1.7;
   private double steeringAdjust = 0;
-  private Supplier<Double> xSteer, yDistance;
-  // private Supplier<Boolean> isTargetFound;
+  private Supplier<Double> xSteer;
 
-  public AimTurret(Supplier<Double> xSteerSupplier, Supplier<Double> yDistanceSupplier) {
+  public AimTurret(Supplier<Double> xSteerSupplier) {
     turret = RobotContainer.mTurret;
     addRequirements(turret);
     xSteer = xSteerSupplier;
-    yDistance = yDistanceSupplier;
   }
 
   @Override

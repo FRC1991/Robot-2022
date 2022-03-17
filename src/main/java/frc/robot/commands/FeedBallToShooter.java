@@ -17,19 +17,16 @@ public class FeedBallToShooter extends CommandBase {
 
   @Override
   public void execute() {
-    intake.setIntakeMotor1(0.5);
-    intake.setIntakeMotor2(0.8);
+    intake.setIntakeMotor1(-0.8);
   }
 
   @Override
   public boolean isFinished() {
-    // return !intake.isBallIn();
     return false;
   }
 
   @Override
   public void end(boolean interrupted) {
     intake.setIntakeMotor1(0);
-    intake.setIntakeMotor2(0);
   }
 }

@@ -24,8 +24,6 @@ import frc.robot.commands.GTADrive;
 import frc.robot.commands.RunIntakeForBall;
 import frc.robot.commands.RunIntakeOutForBall;
 import frc.robot.commands.SetShooterPID;
-import frc.robot.commands.ShiftToClimb;
-import frc.robot.commands.ShiftToDrive;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -63,7 +61,7 @@ public class RobotContainer {
       isTargetFoundEntry;
   public static NetworkTableEntry measuredRPMFlywheel1Entry, measuredRPMFlywheel2Entry;
 
-  SendableChooser autonomousChooser;
+  SendableChooser<Command> autonomousChooser;
 
   GTADrive standardGTADriveCommand =
       new GTADrive(
@@ -73,8 +71,8 @@ public class RobotContainer {
           oInterface.getDriveRightBumper()::get,
           () -> (maxSpeed),
           oInterface.getDriveXButton()::get);
-  BallChase standardBallChaseCommand = new BallChase(() -> (ballXError), () -> (isBallFound));
-  SetShooterPID standardSetShooterPIDCommand =
+  BallChase standardBallChaseCommand = new BallChase(() -> (ballXError));
+  SetShooterPID dashboardBasedShooterRPMCommand =
       new SetShooterPID(() -> (shooterRPMFlywheel1), () -> (shooterRPMFlywheel2));
 
   /**
@@ -159,23 +157,19 @@ public class RobotContainer {
   private void visionInit() {
     // network tables setup
     NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
-    NetworkTable fmsInfoNt = ntInst.getTable("FMSInfo");
     NetworkTable ballNt = ntInst.getTable("limelight-balls");
     NetworkTable shooterNt = ntInst.getTable("limelight-shooter");
 
     // add entry listeners to update variables in code from network tables
 
     // check what alliance color we're on and update limelight to track respective balls
-    fmsInfoNt.addEntryListener(
-        "IsRedAlliance",
-        (table, key, entry, value, flags) -> {
-          if (value.getBoolean()) {
-            ballNt.getEntry("pipeline").setNumber(0);
-          } else {
-            ballNt.getEntry("pipeline").setNumber(1);
-          }
-        },
-        Constants.defaultFlags);
+
+    if(Robot.isRedAlliance) {
+      ballNt.getEntry("pipeline").setNumber(0);
+    } else {
+      ballNt.getEntry("pipeline").setNumber(1);
+    }
+
 
     // update ball information
     ballNt.addEntryListener(
@@ -193,6 +187,8 @@ public class RobotContainer {
         },
         Constants.defaultFlags);
 
+
+
     // update shooter target information
     shooterNt.addEntryListener(
         "tx",
@@ -208,12 +204,16 @@ public class RobotContainer {
         },
         Constants.defaultFlags);
 
+
+
     // update max speed from dashboard
     maxSpeedEntry.addListener(
         (notification) -> {
           maxSpeed = notification.getEntry().getValue().getDouble();
         },
         Constants.defaultFlags);
+
+    // update shooter RPM from dashboard
     shooterRPMFlywheel1Entry.addListener(
         (notification) -> {
           shooterRPMFlywheel1 = notification.getEntry().getValue().getDouble();
@@ -224,11 +224,6 @@ public class RobotContainer {
           shooterRPMFlywheel2 = notification.getEntry().getValue().getDouble();
         },
         Constants.defaultFlags);
-    // hoodAngleEntry.addListener(
-    //     (notification) -> {
-    //       hoodAngle = notification.getEntry().getValue().getDouble();
-    //     },
-    //     Constants.defaultFlags);
   }
 
   /**
@@ -237,77 +232,48 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    *
-   * <p>A button: Chase ball B button: Cancel chase, returm to GTADrive Left Bumper: start aiming
-   * drivetrain TODO: Chainge left bumper to left trigger
    */
 
-  // 0.16 on right servo is drive
-  // 0.24 on right servo is climb
-  // 0.47 is for drive on left servo
-  // 0.39 is for climb on left servo
   private void configureButtonBindings() {
-    mDrivetrain.setDefaultCommand(standardGTADriveCommand);
-    oInterface.getDriveSelectButton().whenPressed(new ShiftToClimb().withTimeout(4));
-    oInterface.getDriveStartButton().whenPressed(new ShiftToDrive().withTimeout(4));
 
+    // Driver Driving Bindings
+    mDrivetrain.setDefaultCommand(standardGTADriveCommand);
+
+    // Driver Shifting Bindings (not needed for now)
+    // oInterface.getDriveSelectButton().whenPressed(new ShiftToClimb().withTimeout(4));
+    // oInterface.getDriveStartButton().whenPressed(new ShiftToDrive().withTimeout(4));
+
+    // Driver Ball Chasing Bindings
     oInterface.getDriveAButton().whenPressed(standardBallChaseCommand);
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
 
-    // oInterface.getDriveXButton().whenPressed(standardSetShooterPIDCommand);
-
-    mTurret.setDefaultCommand(
-        new RunCommand(
-            () -> {
-              mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.1);
-              // mTurret.setHood(oInterface.getDriveRightYAxis() * 0.2);
-              // System.out.println(mTurret.getTurretPosition());
-            },
-            mTurret));
-    // mTurret.setDefaultCommand(new RunCommand(()->{
-    // System.out.println(mTurret.getTurretPosition());
-    // }, mTurret));
-
+    // Aux Manual Turret Control Bindings
+    mTurret.setDefaultCommand(new RunCommand(() -> {
+        mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.2);
+      },mTurret));
+    
+    // Aux Ball Chasing Bindings
     oInterface.getAuxAButton().whenPressed(standardBallChaseCommand);
     oInterface.getAuxBButton().whenPressed(standardGTADriveCommand);
-    // oInterface.getAuxLeftBumper().whenPressed(new AimTurret(null, null));
-    // oInterface.getAuxRightBumper().whenPressed(new ShootBall());
-    // oInterface.getAuxLeftTriggerButton().whileActiveOnce(new AimDrivetrain(()->(targetXSteer),
-    // ()->(yDistance)));
-
-    // 8feet
-    // oInterface.getAuxRightTriggerButton().whileActiveOnce(new ShootBallForReal(()->(2750.),
-    // ()->(2000.)));
-
-    // oInterface.getAuxRightTriggerButton().whileActiveOnce(new ShootBallForReal(()->(2150.),
-    // ()->(2000.)));
-
-    // oInterface.getAuxRightTriggerButton().whileActiveOnce(new
-    // ShootBallForReal(()->((2150.)+(Math.abs(yDistance)*41.3)), ()->(2000.)));
-    oInterface.getAuxRightTriggerButton().whileActiveOnce(new FeedBallToShooter().withTimeout(0.5));
-
-    // oInterface.getAuxRightTriggerButton().whileActiveOnce(new
-    // ShootBallForReal(()->(shooterRPMFlywheel1), ()->(shooterRPMFlywheel2)));
-
-    mShooter.setDefaultCommand(
-        new SetShooterPID(() -> ((2150.) + (Math.abs(yDistance) * 41.3)), () -> (2000.)));
-
-    // oInterface.getAuxRightTriggerButton().whileActiveOnce(new ShootBallForReal(()->(3700.),
-    // ()->(0.)));
+    
+    // Aux Intake Bindings
     oInterface.getAuxLeftStickDownButton().whileActiveContinuous(new RunIntakeForBall());
     oInterface.getAuxLeftStickUpButton().whileActiveContinuous(new RunIntakeOutForBall());
-    oInterface.getAuxRightStickUpButton().whileActiveContinuous(new RunIntakeOutForBall());
-    oInterface.getAuxRightStickDownButton().whileActiveContinuous(new RunIntakeOutForBall());
+
+    // Aux Shooting Bindings
+    oInterface.getAuxRightTriggerButton().whileActiveOnce(new FeedBallToShooter().withTimeout(0.5));
+    
+    // Limelight Shooter Ranging
+    mShooter.setDefaultCommand(
+        new SetShooterPID(() -> ((2100.) + (Math.abs(yDistance) * 44)), () -> ((2000.)- (Math.abs(yDistance) * 22))));
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * <p>Will likely be some kind of Ramsette Command, but for now, leave it as is. TODO: add
-   * Ramsette command
-   *
+   *  
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return new BackupAutoShort(() -> (targetXSteer), () -> (yDistance));
+    return autonomousChooser.getSelected();
   }
 }

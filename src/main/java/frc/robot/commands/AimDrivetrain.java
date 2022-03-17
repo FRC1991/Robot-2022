@@ -8,21 +8,17 @@ import java.util.function.Supplier;
 
 public class AimDrivetrain extends CommandBase {
 
-  // TODO: Integerate target detection, ranging based on yDistance
-  // TODO: Convert to turret code once it's bulit
-
   private Drivetrain drivetrain;
   private OperatingInterface oInterface = RobotContainer.oInterface;
   private final double steeringScale = 0.8;
   private double steeringAdjust = 0;
-  private Supplier<Double> xSteer, yDistance;
+  private Supplier<Double> xSteer;
   // private Supplier<Boolean> isTargetFound;
 
-  public AimDrivetrain(Supplier<Double> xSteerSupplier, Supplier<Double> yDistanceSupplier) {
+  public AimDrivetrain(Supplier<Double> xSteerSupplier) {
     drivetrain = RobotContainer.mDrivetrain;
     addRequirements(drivetrain);
     xSteer = xSteerSupplier;
-    yDistance = yDistanceSupplier;
   }
 
   @Override
