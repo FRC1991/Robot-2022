@@ -15,15 +15,16 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import frc.robot.commands.AutoPath1;
-import frc.robot.commands.BackupAutoLong;
-import frc.robot.commands.BackupAutoShort;
-import frc.robot.commands.BallChase;
-import frc.robot.commands.FeedBallToShooter;
-import frc.robot.commands.GTADrive;
-import frc.robot.commands.RunIntakeForBall;
-import frc.robot.commands.RunIntakeOutForBall;
-import frc.robot.commands.SetShooterPID;
+import frc.robot.OperatingInterface.OperatingInterface;
+import frc.robot.commands.AutoCommands.AutoPath1;
+import frc.robot.commands.AutoCommands.BackupAutoLong;
+import frc.robot.commands.AutoCommands.BackupAutoShort;
+import frc.robot.commands.DrivetrainCommands.BallChase;
+import frc.robot.commands.DrivetrainCommands.GTADrive;
+import frc.robot.commands.IntakeCommands.FeedBallToShooter;
+import frc.robot.commands.IntakeCommands.RunIntakeForBall;
+import frc.robot.commands.IntakeCommands.RunIntakeOutForBall;
+import frc.robot.commands.ShooterCommands.SetShooterPID;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -164,12 +165,11 @@ public class RobotContainer {
 
     // check what alliance color we're on and update limelight to track respective balls
 
-    if(Robot.isRedAlliance) {
+    if (Robot.isRedAlliance) {
       ballNt.getEntry("pipeline").setNumber(0);
     } else {
       ballNt.getEntry("pipeline").setNumber(1);
     }
-
 
     // update ball information
     ballNt.addEntryListener(
@@ -187,8 +187,6 @@ public class RobotContainer {
         },
         Constants.defaultFlags);
 
-
-
     // update shooter target information
     shooterNt.addEntryListener(
         "tx",
@@ -203,8 +201,6 @@ public class RobotContainer {
           yDistance = value.getDouble();
         },
         Constants.defaultFlags);
-
-
 
     // update max speed from dashboard
     maxSpeedEntry.addListener(
@@ -231,9 +227,7 @@ public class RobotContainer {
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   *
    */
-
   private void configureButtonBindings() {
 
     // Driver Driving Bindings
@@ -248,29 +242,34 @@ public class RobotContainer {
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
 
     // Aux Manual Turret Control Bindings
-    mTurret.setDefaultCommand(new RunCommand(() -> {
-        mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.2);
-      },mTurret));
-    
+    mTurret.setDefaultCommand(
+        new RunCommand(
+            () -> {
+              mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.2);
+            },
+            mTurret));
+
     // Aux Ball Chasing Bindings
     oInterface.getAuxAButton().whenPressed(standardBallChaseCommand);
     oInterface.getAuxBButton().whenPressed(standardGTADriveCommand);
-    
+
     // Aux Intake Bindings
     oInterface.getAuxLeftStickDownButton().whileActiveContinuous(new RunIntakeForBall());
     oInterface.getAuxLeftStickUpButton().whileActiveContinuous(new RunIntakeOutForBall());
 
     // Aux Shooting Bindings
     oInterface.getAuxRightTriggerButton().whileActiveOnce(new FeedBallToShooter().withTimeout(0.5));
-    
+
     // Limelight Shooter Ranging
     mShooter.setDefaultCommand(
-        new SetShooterPID(() -> ((2100.) + (Math.abs(yDistance) * 44)), () -> ((2000.)- (Math.abs(yDistance) * 22))));
+        new SetShooterPID(
+            () -> ((2100.) + (Math.abs(yDistance) * 44)),
+            () -> ((2000.) - (Math.abs(yDistance) * 22))));
   }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
-   *  
+   *
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {

@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.OperatingInterface;
 
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Timer;
@@ -69,13 +69,13 @@ public class OperatingInterface {
     dPadDownDriveButton = new DPadButton(driveJoystick, DPadButton.Direction.DOWN);
     dPadLeftDriveButton = new DPadButton(driveJoystick, DPadButton.Direction.LEFT);
     dPadRightDriveButton = new DPadButton(driveJoystick, DPadButton.Direction.RIGHT);
-    rightStickUpDriveButton = new JoystickAnalogButton(driveJoystick, 5);
+    rightStickUpDriveButton = new JoystickAnalogButton(driveJoystick, 5, -0.5);
     rightStickDownDriveButton = new JoystickAnalogButton(driveJoystick, 5);
-    rightStickLeftDriveButton = new JoystickAnalogButton(driveJoystick, 4);
+    rightStickLeftDriveButton = new JoystickAnalogButton(driveJoystick, 4, -0.5);
     rightStickRightDriveButton = new JoystickAnalogButton(driveJoystick, 4);
-    leftStickUpDriveButton = new JoystickAnalogButton(driveJoystick, 1);
+    leftStickUpDriveButton = new JoystickAnalogButton(driveJoystick, 1, -0.5);
     leftStickDownDriveButton = new JoystickAnalogButton(driveJoystick, 1);
-    leftStickLeftDriveButton = new JoystickAnalogButton(driveJoystick, 0);
+    leftStickLeftDriveButton = new JoystickAnalogButton(driveJoystick, 0, -0.5);
     leftStickRightDriveButton = new JoystickAnalogButton(driveJoystick, 0);
     leftTriggerDriveButton = new JoystickAnalogButton(driveJoystick, 2);
     rightTriggerDriveButton = new JoystickAnalogButton(driveJoystick, 3);
@@ -92,13 +92,13 @@ public class OperatingInterface {
     dPadDownAuxButton = new DPadButton(auxJoystick, DPadButton.Direction.DOWN);
     dPadLeftAuxButton = new DPadButton(auxJoystick, DPadButton.Direction.LEFT);
     dPadRightAuxButton = new DPadButton(auxJoystick, DPadButton.Direction.RIGHT);
-    rightStickUpAuxButton = new JoystickAnalogButton(auxJoystick, 5);
+    rightStickUpAuxButton = new JoystickAnalogButton(auxJoystick, 5, -0.5);
     rightStickDownAuxButton = new JoystickAnalogButton(auxJoystick, 5);
-    rightStickLeftAuxButton = new JoystickAnalogButton(auxJoystick, 4);
+    rightStickLeftAuxButton = new JoystickAnalogButton(auxJoystick, 4, -0.5);
     rightStickRightAuxButton = new JoystickAnalogButton(auxJoystick, 4);
-    leftStickUpAuxButton = new JoystickAnalogButton(auxJoystick, 1);
+    leftStickUpAuxButton = new JoystickAnalogButton(auxJoystick, 1, -0.5);
     leftStickDownAuxButton = new JoystickAnalogButton(auxJoystick, 1);
-    leftStickLeftAuxButton = new JoystickAnalogButton(auxJoystick, 0);
+    leftStickLeftAuxButton = new JoystickAnalogButton(auxJoystick, 0, -0.5);
     leftStickRightAuxButton = new JoystickAnalogButton(auxJoystick, 0);
     leftTriggerAuxButton = new JoystickAnalogButton(auxJoystick, 2);
     rightTriggerAuxButton = new JoystickAnalogButton(auxJoystick, 3);

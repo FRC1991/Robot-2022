@@ -1,7 +1,7 @@
-package frc.robot.commands;
+package frc.robot.commands.DrivetrainCommands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.OperatingInterface;
+import frc.robot.OperatingInterface.OperatingInterface;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Drivetrain;
 import java.util.function.Supplier;

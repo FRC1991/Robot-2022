@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
     isRedAlliance = DriverStation.getAlliance().compareTo(DriverStation.Alliance.Red) == 0;
     ballNt = NetworkTableInstance.getDefault().getTable("limelight-balls");
-    if(Robot.isRedAlliance) {
+    if (Robot.isRedAlliance) {
       ballNt.getEntry("pipeline").setNumber(0);
     } else {
       ballNt.getEntry("pipeline").setNumber(1);
@@ -69,7 +69,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     isRedAlliance = DriverStation.getAlliance().compareTo(DriverStation.Alliance.Red) == 0;
     ballNt = NetworkTableInstance.getDefault().getTable("limelight-balls");
-    if(Robot.isRedAlliance) {
+    if (Robot.isRedAlliance) {
       ballNt.getEntry("pipeline").setNumber(0);
     } else {
       ballNt.getEntry("pipeline").setNumber(1);
@@ -97,7 +97,7 @@ public class Robot extends TimedRobot {
     }
     isRedAlliance = DriverStation.getAlliance().compareTo(DriverStation.Alliance.Red) == 0;
     ballNt = NetworkTableInstance.getDefault().getTable("limelight-balls");
-    if(Robot.isRedAlliance) {
+    if (Robot.isRedAlliance) {
       ballNt.getEntry("pipeline").setNumber(0);
     } else {
       ballNt.getEntry("pipeline").setNumber(1);
