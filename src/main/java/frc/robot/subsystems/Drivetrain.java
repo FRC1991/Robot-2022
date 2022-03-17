@@ -94,13 +94,13 @@ public class Drivetrain extends SubsystemBase {
     double netSpeed = forwardSpeed + backwardSpeed;
 
     if (Math.abs(netSpeed) > deadband * multiplier) {
-      differentialDrive.curvatureDrive(netSpeed, multiplier * rotation, isQuickTurn);
+      differentialDrive.curvatureDrive(netSpeed, multiplier * -rotation, isQuickTurn);
     } else if (Math.abs(netSpeed) > 0.01 * multiplier) {
-      setDrivetrain(-rotation, rotation, multiplier);
+      setDrivetrain(rotation, rotation, multiplier);
     } else if (isQuickTurn) {
-      differentialDrive.curvatureDrive(0, rotation * multiplier, true);
+      differentialDrive.curvatureDrive(0, -rotation * multiplier, true);
     } else {
-      differentialDrive.curvatureDrive(0, rotation * multiplier * 0.5, true);
+      differentialDrive.curvatureDrive(0, -rotation * multiplier, true);
     }
   }
 
@@ -208,10 +208,5 @@ public class Drivetrain extends SubsystemBase {
     return rightMotor1
         .getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192)
         .getPosition();
-  }
-
-  @Override
-  public void periodic() {
-    super.periodic();
   }
 }

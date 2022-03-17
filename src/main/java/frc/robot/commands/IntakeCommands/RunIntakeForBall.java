@@ -19,7 +19,6 @@ public class RunIntakeForBall extends CommandBase {
   @Override
   public void execute() {
     intake.setIntakeMotor1(0.8);
-    System.out.println(RobotContainer.oInterface.getAuxLeftStickDownButton().get());
   }
 
   @Override

@@ -93,24 +93,23 @@ public class OperatingInterface {
     dPadLeftAuxButton = new DPadButton(auxJoystick, DPadButton.Direction.LEFT);
     dPadRightAuxButton = new DPadButton(auxJoystick, DPadButton.Direction.RIGHT);
     rightStickUpAuxButton = new JoystickAnalogButton(auxJoystick, 5, -0.5);
-    rightStickDownAuxButton = new JoystickAnalogButton(auxJoystick, 5);
+    rightStickDownAuxButton = new JoystickAnalogButton(auxJoystick, 5, 0.5);
     rightStickLeftAuxButton = new JoystickAnalogButton(auxJoystick, 4, -0.5);
-    rightStickRightAuxButton = new JoystickAnalogButton(auxJoystick, 4);
+    rightStickRightAuxButton = new JoystickAnalogButton(auxJoystick, 4, 0.5);
     leftStickUpAuxButton = new JoystickAnalogButton(auxJoystick, 1, -0.5);
-    leftStickDownAuxButton = new JoystickAnalogButton(auxJoystick, 1);
+    leftStickDownAuxButton = new JoystickAnalogButton(auxJoystick, 1, 0.5);
     leftStickLeftAuxButton = new JoystickAnalogButton(auxJoystick, 0, -0.5);
-    leftStickRightAuxButton = new JoystickAnalogButton(auxJoystick, 0);
-    leftTriggerAuxButton = new JoystickAnalogButton(auxJoystick, 2);
-    rightTriggerAuxButton = new JoystickAnalogButton(auxJoystick, 3);
+    leftStickRightAuxButton = new JoystickAnalogButton(auxJoystick, 0, 0.5);
+    leftTriggerAuxButton = new JoystickAnalogButton(auxJoystick, 2, 0.5);
+    rightTriggerAuxButton = new JoystickAnalogButton(auxJoystick, 3, 0.5);
   }
 
   public double getDriveLeftYAxis() {
     return driveJoystick.getRawAxis(1);
   }
 
-  // only for waterbury
   public double getDriveLeftXAxis() {
-    return -driveJoystick.getRawAxis(0);
+    return driveJoystick.getRawAxis(0);
   }
 
   public double getDriveRightYAxis() {

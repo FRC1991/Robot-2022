@@ -237,6 +237,13 @@ public class RobotContainer {
     // oInterface.getDriveSelectButton().whenPressed(new ShiftToClimb().withTimeout(4));
     // oInterface.getDriveStartButton().whenPressed(new ShiftToDrive().withTimeout(4));
 
+    mIntake.setDefaultCommand(
+        new RunCommand(
+            () -> {
+              System.out.println(oInterface.getAuxLeftStickUpButton().get());
+            },
+            mIntake));
+
     // Driver Ball Chasing Bindings
     oInterface.getDriveAButton().whenPressed(standardBallChaseCommand);
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);

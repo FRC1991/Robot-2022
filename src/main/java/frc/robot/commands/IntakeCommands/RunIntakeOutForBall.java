@@ -27,7 +27,6 @@ public class RunIntakeOutForBall extends CommandBase {
   @Override
   public void execute() {
     intake.setIntakeMotor1(-0.8);
-    System.out.println(RobotContainer.oInterface.getAuxLeftStickUpButton().get());
   }
 
   // Called once the command ends or is interrupted.
