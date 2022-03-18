@@ -16,15 +16,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import frc.robot.OperatingInterface.OperatingInterface;
-import frc.robot.commands.AutoCommands.AutoPath1;
-import frc.robot.commands.AutoCommands.BackupAutoLong;
-import frc.robot.commands.AutoCommands.BackupAutoShort;
+import frc.robot.commands.AutoCommands.ComplexAuto;
+import frc.robot.commands.AutoCommands.TwoBallAuto;
 import frc.robot.commands.DrivetrainCommands.BallChase;
 import frc.robot.commands.DrivetrainCommands.GTADrive;
+import frc.robot.commands.DrivetrainCommands.TurnGyro;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
 import frc.robot.commands.IntakeCommands.RunIntakeForBall;
 import frc.robot.commands.IntakeCommands.RunIntakeOutForBall;
 import frc.robot.commands.ShooterCommands.SetShooterPID;
+import frc.robot.commands.TurretCommands.AimTurret;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -136,17 +137,6 @@ public class RobotContainer {
             .add("Flywheel 2", 0)
             .withWidget(BuiltInWidgets.kTextView)
             .getEntry();
-
-    autonomousChooser = new SendableChooser<Command>();
-    autonomousChooser.addOption(
-        "Backup Auto Short", new BackupAutoShort(() -> (targetXSteer), () -> (yDistance)));
-    autonomousChooser.addOption(
-        "Backup Auto Long", new BackupAutoLong(() -> (targetXSteer), () -> (yDistance)));
-    autonomousChooser.addOption("Complex Auto", new AutoPath1());
-    autonomousChooser.setDefaultOption(
-        "Backup Auto Long", new BackupAutoLong(() -> (targetXSteer), () -> (yDistance)));
-    Shuffleboard.getTab("Main").add(autonomousChooser);
-
     // HttpCamera limelightBallCamera =
     //     new HttpCamera("limelight-balls-http", "http://10.19.91.69:5800");
     // Shuffleboard.getTab("Main").add(limelightBallCamera);
@@ -237,13 +227,6 @@ public class RobotContainer {
     // oInterface.getDriveSelectButton().whenPressed(new ShiftToClimb().withTimeout(4));
     // oInterface.getDriveStartButton().whenPressed(new ShiftToDrive().withTimeout(4));
 
-    mIntake.setDefaultCommand(
-        new RunCommand(
-            () -> {
-              System.out.println(oInterface.getAuxLeftStickUpButton().get());
-            },
-            mIntake));
-
     // Driver Ball Chasing Bindings
     oInterface.getDriveAButton().whenPressed(standardBallChaseCommand);
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
@@ -261,17 +244,21 @@ public class RobotContainer {
     oInterface.getAuxBButton().whenPressed(standardGTADriveCommand);
 
     // Aux Intake Bindings
-    oInterface.getAuxLeftStickDownButton().whileActiveContinuous(new RunIntakeForBall());
-    oInterface.getAuxLeftStickUpButton().whileActiveContinuous(new RunIntakeOutForBall());
+    oInterface.getAuxLeftStickDownButton().whileActiveOnce(new RunIntakeForBall());
+    oInterface.getAuxLeftStickUpButton().whileActiveOnce(new RunIntakeOutForBall());
 
     // Aux Shooting Bindings
     oInterface.getAuxRightTriggerButton().whileActiveOnce(new FeedBallToShooter().withTimeout(0.5));
+    oInterface.getAuxLeftTriggerButton().whileActiveOnce(new AimTurret(()->(targetXSteer)));
 
     // Limelight Shooter Ranging
+
     mShooter.setDefaultCommand(
-        new SetShooterPID(
-            () -> ((2100.) + (Math.abs(yDistance) * 44)),
-            () -> ((2000.) - (Math.abs(yDistance) * 22))));
+      new SetShooterPID(
+        () -> ((0.0146*Math.pow(Math.abs(yDistance),3)-(0.2013*Math.pow(Math.abs(yDistance),2))+(27.232*Math.abs(yDistance))+1972.8)),
+        () -> ((2000.))
+        ));
+
   }
 
   /**
@@ -280,6 +267,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autonomousChooser.getSelected();
+    // return new TwoBallAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer));
+    return new ComplexAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer));
   }
 }

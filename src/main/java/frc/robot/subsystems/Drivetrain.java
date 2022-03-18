@@ -15,7 +15,7 @@ public class Drivetrain extends SubsystemBase {
   private DifferentialDrive differentialDrive;
   private double deadband = Constants.globalDeadband;
 
-  private final CANSparkMax leftMotor1,
+  private static CANSparkMax leftMotor1,
       leftMotor2,
       leftMotor3,
       rightMotor1,
@@ -209,4 +209,31 @@ public class Drivetrain extends SubsystemBase {
         .getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192)
         .getPosition();
   }
+
+  public CANSparkMax getLeftMotor1() {
+    return leftMotor1;
+  }
+
+  
+
+  public CANSparkMax getLeftMotor2() {
+    return leftMotor2;
+  }
+
+  public CANSparkMax getLeftMotor3() {
+    return leftMotor3;
+  }
+
+  public CANSparkMax getRightMotor2() {
+    return rightMotor2;
+  }
+
+  public CANSparkMax getRightMotor3() {
+    return rightMotor3;
+  }
+
+  public CANSparkMax getRightMotor1() {
+    return rightMotor1;
+  }
+
 }

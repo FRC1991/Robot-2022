@@ -18,7 +18,8 @@ public class RunIntakeForBall extends CommandBase {
 
   @Override
   public void execute() {
-    intake.setIntakeMotor1(0.8);
+    intake.setIntakeMotor1(-0.8);
+    intake.setIntakeMotor2(0.8);
   }
 
   @Override
@@ -29,5 +30,6 @@ public class RunIntakeForBall extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     intake.setIntakeMotor1(0);
+    intake.setIntakeMotor2(0);
   }
 }

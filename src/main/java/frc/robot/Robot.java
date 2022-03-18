@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -74,6 +76,12 @@ public class Robot extends TimedRobot {
     } else {
       ballNt.getEntry("pipeline").setNumber(1);
     }
+    RobotContainer.mDrivetrain.getLeftMotor1().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mDrivetrain.getLeftMotor2().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mDrivetrain.getLeftMotor3().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mDrivetrain.getRightMotor1().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mDrivetrain.getRightMotor2().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mDrivetrain.getRightMotor3().setIdleMode(IdleMode.kBrake);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -95,6 +103,12 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    RobotContainer.mDrivetrain.getLeftMotor1().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getLeftMotor2().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getLeftMotor3().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getRightMotor1().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getRightMotor2().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getRightMotor3().setIdleMode(IdleMode.kCoast);
     isRedAlliance = DriverStation.getAlliance().compareTo(DriverStation.Alliance.Red) == 0;
     ballNt = NetworkTableInstance.getDefault().getTable("limelight-balls");
     if (Robot.isRedAlliance) {

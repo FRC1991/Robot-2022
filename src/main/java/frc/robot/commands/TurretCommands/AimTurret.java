@@ -9,15 +9,14 @@ import java.util.function.Supplier;
 public class AimTurret extends CommandBase {
 
   private Turret turret;
-  private final double minCommand = 0.05;
   private final double steeringScale = 1.7;
   private double steeringAdjust = 0;
   private Supplier<Double> xSteer;
 
-  public AimTurret(Supplier<Double> xSteerSupplier) {
+  public AimTurret(Supplier<Double> targetXSteerSupplier) {
     turret = RobotContainer.mTurret;
     addRequirements(turret);
-    xSteer = xSteerSupplier;
+    xSteer = targetXSteerSupplier;
   }
 
   @Override
@@ -36,11 +35,9 @@ public class AimTurret extends CommandBase {
     // multiplying by 0.015 to normalize the degree value to between -1 and 1
     if (xSteer.get() > 0.000000001) {
       steeringAdjust = xSteer.get() * 0.015;
-      steeringAdjust = steeringAdjust + minCommand;
       steeringAdjust = steeringAdjust * steeringScale;
     } else if (xSteer.get() < -0.000000001) {
       steeringAdjust = xSteer.get() * 0.015;
-      steeringAdjust = steeringAdjust - minCommand;
       steeringAdjust = steeringAdjust * steeringScale;
     } else {
       steeringAdjust = 0;
@@ -57,7 +54,7 @@ public class AimTurret extends CommandBase {
   @Override
   public boolean isFinished() {
     // if target is within 1 degree, finish command
-    return xSteer.get() < 0.000000001;
+    return Math.abs(xSteer.get()) < 0.0001;
   }
 
   @Override

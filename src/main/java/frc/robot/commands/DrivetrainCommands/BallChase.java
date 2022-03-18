@@ -17,12 +17,21 @@ public class BallChase extends CommandBase {
   private final double steeringScale = Constants.kPForVision;
   private double steeringAdjust = 0;
   private Supplier<Double> xSteer;
+  private double speed = 1;
 
   public BallChase(Supplier<Double> xSteerSupplier) {
     drivetrain = RobotContainer.mDrivetrain;
     intake = RobotContainer.mIntake;
     addRequirements(drivetrain);
     xSteer = xSteerSupplier;
+  }
+
+  public BallChase(Supplier<Double> xSteerSupplier, double speed) {
+    drivetrain = RobotContainer.mDrivetrain;
+    intake = RobotContainer.mIntake;
+    addRequirements(drivetrain);
+    xSteer = xSteerSupplier;
+    this.speed = speed;
   }
 
   @Override
@@ -50,10 +59,11 @@ public class BallChase extends CommandBase {
     } else {
       steeringAdjust = 0;
     }
-    drivetrain.arcadeDrive(-1, -steeringAdjust);
-    System.out.println("Ball Chase Output to Drive " + steeringAdjust);
+    drivetrain.arcadeDrive(-speed, -steeringAdjust);
+    // System.out.println("Ball Chase Output to Drive " + steeringAdjust);
 
     intake.setIntakeMotor1(-0.5);
+    intake.setIntakeMotor2(0.5);
   }
 
   @Override
@@ -66,6 +76,7 @@ public class BallChase extends CommandBase {
   public void end(boolean interrupted) {
     // let driver know they have control again and update network tables
     intake.setIntakeMotor1(0);
+    intake.setIntakeMotor2(0);
     oInterface.doubleVibrateDrive();
     NetworkTableInstance.getDefault()
         .getTable("Shuffleboard")
