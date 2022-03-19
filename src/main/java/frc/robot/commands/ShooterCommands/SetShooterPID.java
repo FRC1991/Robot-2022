@@ -18,13 +18,15 @@ public class SetShooterPID extends CommandBase {
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+  }
 
   @Override
   public void execute() {
     mShooter.setShooterPID(rpmFlywheel1.get(), rpmFlywheel2.get());
     RobotContainer.measuredRPMFlywheel1Entry.setNumber(mShooter.getMainFlywheel1Velocity());
     RobotContainer.measuredRPMFlywheel2Entry.setNumber(mShooter.getSecondaryFlywheelVelocity());
+    System.out.println("Flywheel 1 RPM: "+rpmFlywheel1.get()+"\nFLywheel 2 RPM: "+rpmFlywheel2.get());
   }
 
   @Override

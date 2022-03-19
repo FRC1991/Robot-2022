@@ -52,7 +52,8 @@ public class RobotContainer {
       maxSpeed,
       shooterRPMFlywheel1,
       shooterRPMFlywheel2,
-      hoodAngle = 0;
+      hoodAngle,
+      manualRPMAdjust = 0;
   public static boolean isBallFound, isChasingBall, isTargetFound = false;
   NetworkTableEntry isBallFoundEntry,
       maxSpeedEntry,
@@ -140,6 +141,10 @@ public class RobotContainer {
     // HttpCamera limelightBallCamera =
     //     new HttpCamera("limelight-balls-http", "http://10.19.91.69:5800");
     // Shuffleboard.getTab("Main").add(limelightBallCamera);
+
+    autonomousChooser = new SendableChooser<Command>();
+    autonomousChooser.setDefaultOption("Two Ball Auto", new TwoBallAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer)));
+    autonomousChooser.addOption("Complex Auto", new ComplexAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer)));
   }
 
   /*
@@ -250,15 +255,23 @@ public class RobotContainer {
     // Aux Shooting Bindings
     oInterface.getAuxRightTriggerButton().whileActiveOnce(new FeedBallToShooter().withTimeout(0.5));
     oInterface.getAuxLeftTriggerButton().whileActiveOnce(new AimTurret(()->(targetXSteer)));
+    oInterface.getAuxDPadUp().whenPressed(()->{
+      manualRPMAdjust+=10;
+    });
+    oInterface.getAuxDPadDown().whenPressed(()->{
+      manualRPMAdjust-=10;
+    });
 
     // Limelight Shooter Ranging
 
     mShooter.setDefaultCommand(
       new SetShooterPID(
-        () -> ((0.0146*Math.pow(Math.abs(yDistance),3)-(0.2013*Math.pow(Math.abs(yDistance),2))+(27.232*Math.abs(yDistance))+1972.8)),
+        () -> ((0.0146*Math.pow(Math.abs(yDistance),3)-(0.2013*Math.pow(Math.abs(yDistance),2))+(27.232*Math.abs(yDistance))+1972.8)+(manualRPMAdjust)),
         () -> ((2000.))
         ));
+    
 
+    
   }
 
   /**

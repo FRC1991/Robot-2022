@@ -13,7 +13,9 @@ public class FeedBallToShooter extends CommandBase {
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+    System.out.println("Shot Taken!\nLL Distance at: "+RobotContainer.yDistance);
+  }
 
   @Override
   public void execute() {
