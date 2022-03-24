@@ -1,6 +1,7 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
+// does not work, not sure why, will not fix
 
 package frc.robot;
 
@@ -11,12 +12,24 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.commands.AimDrivetrain;
-import frc.robot.commands.BallChase;
-import frc.robot.commands.GTADrive;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import frc.robot.OperatingInterface.OperatingInterface;
+import frc.robot.commands.AutoCommands.ComplexAuto;
+import frc.robot.commands.AutoCommands.TwoBallAuto;
+import frc.robot.commands.DrivetrainCommands.BallChase;
+import frc.robot.commands.DrivetrainCommands.GTADrive;
+import frc.robot.commands.DrivetrainCommands.TurnGyro;
+import frc.robot.commands.IntakeCommands.FeedBallToShooter;
+import frc.robot.commands.IntakeCommands.RunIntakeForBall;
+import frc.robot.commands.IntakeCommands.RunIntakeOutForBall;
+import frc.robot.commands.ShooterCommands.SetShooterPID;
+import frc.robot.commands.TurretCommands.AimTurret;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
 import java.util.Map;
 
 /**
@@ -26,83 +39,154 @@ import java.util.Map;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+  // The robot's subsystems, commands, and global variables are defined here
 
   public static Drivetrain mDrivetrain = new Drivetrain();
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
-  // public static ColorSensor mColorSensor = new ColorSensor();
-  // public static LiDAR mLiDAR = new LiDAR();
-  public static double centerXSteer, drivetrainXSteer, yDistance, maxSpeed = 0;
-  public static boolean isTargetFound, isChasingBall = false;
-  NetworkTableEntry isBallFoundEntry, maxSpeedEntry, isChasingBallEntry;
+  public static Shooter mShooter = new Shooter();
+  public static Turret mTurret = new Turret();
+  public static double ballXError,
+      targetXSteer,
+      yDistance,
+      maxSpeed,
+      shooterRPMFlywheel1,
+      shooterRPMFlywheel2,
+      hoodAngle,
+      manualRPMAdjust = 0;
+  public static boolean isBallFound, isChasingBall, isTargetFound = false;
+  NetworkTableEntry isBallFoundEntry,
+      maxSpeedEntry,
+      isChasingBallEntry,
+      shooterRPMFlywheel1Entry,
+      shooterRPMFlywheel2Entry,
+      hoodAngleEntry,
+      isTargetFoundEntry;
+  public static NetworkTableEntry measuredRPMFlywheel1Entry, measuredRPMFlywheel2Entry;
+
+  SendableChooser<Command> autonomousChooser;
 
   GTADrive standardGTADriveCommand =
       new GTADrive(
-          oInterface::getRightTriggerAxis,
-          oInterface::getLeftTriggerAxis,
-          oInterface::getLeftXAxis,
-          oInterface.getRightBumper()::get,
-          () -> (maxSpeed));
-  BallChase standardBallChaseCommand = new BallChase(() -> (centerXSteer), () -> (isTargetFound));
+          oInterface::getDriveRightTriggerAxis,
+          oInterface::getDriveLeftTriggerAxis,
+          oInterface::getDriveLeftXAxis,
+          oInterface.getDriveRightBumper()::get,
+          () -> (maxSpeed),
+          oInterface.getDriveXButton()::get);
+  BallChase standardBallChaseCommand = new BallChase(() -> (ballXError));
+  SetShooterPID dashboardBasedShooterRPMCommand =
+      new SetShooterPID(() -> (shooterRPMFlywheel1), () -> (shooterRPMFlywheel2));
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands. Try to keep this as
+   * clean as possible, extract most of your code into functions.
+   */
   public RobotContainer() {
     dashboardInit();
     visionInit();
     configureButtonBindings();
   }
 
+  /**
+   * Add variables to shuffleboard
+   *
+   * <p>isChasingBallEntry determines if driver has control or not isBallFoundEntry is secondary
+   * confirmation for ball detection maxSpeedEntry is the limiter for GTADrive (falls back to value
+   * set in Constants.java)super secret secret(lets hope it saves)
+   */
   private void dashboardInit() {
+    isChasingBallEntry = Shuffleboard.getTab("Main").add("Chasing Ball", isChasingBall).getEntry();
+    isBallFoundEntry = Shuffleboard.getTab("Main").add("Ball Found", isBallFound).getEntry();
 
-    /** */
-    isChasingBallEntry =
-        Shuffleboard.getTab("Main").add("Is Chasing Ball", isChasingBall).getEntry();
-    isBallFoundEntry = Shuffleboard.getTab("Main").add("Target Found", isTargetFound).getEntry();
+    isTargetFoundEntry =
+        Shuffleboard.getTab("Main").add("Shot Target Found", isTargetFound).getEntry();
+
     maxSpeedEntry =
         Shuffleboard.getTab("Main")
             .add("Max Speed", Constants.GTADriveMultiplier)
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", 0, "max", 1))
             .getEntry();
+    shooterRPMFlywheel1Entry =
+        Shuffleboard.getTab("Main")
+            .add("Shooter Flywheel 1 RPM", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 6000))
+            .getEntry();
+    shooterRPMFlywheel2Entry =
+        Shuffleboard.getTab("Main")
+            .add("Shooter Flywheel 2 RPM", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 20000))
+            .getEntry();
+
+    // hoodAngleEntry =
+    // Shuffleboard.getTab("Main")
+    // .add("Hood Angle", 0)
+    // .withWidget(BuiltInWidgets.kNumberSlider)
+    // .withProperties(Map.of("min", 0, "max", 55))
+    // .getEntry();
+    measuredRPMFlywheel1Entry =
+        Shuffleboard.getTab("Main")
+            .add("Flywheel 1", 0)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+
+    measuredRPMFlywheel2Entry =
+        Shuffleboard.getTab("Main")
+            .add("Flywheel 2", 0)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+    // HttpCamera limelightBallCamera =
+    //     new HttpCamera("limelight-balls-http", "http://10.19.91.69:5800");
+    // Shuffleboard.getTab("Main").add(limelightBallCamera);
+
+    autonomousChooser = new SendableChooser<Command>();
+    autonomousChooser.setDefaultOption("Two Ball Auto", new TwoBallAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer)));
+    autonomousChooser.addOption("Complex Auto", new ComplexAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer)));
   }
 
+  /*
+   * Mostly NT setup for now, could change later
+   */
   private void visionInit() {
+    // network tables setup
     NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
-    NetworkTable fmsInfoNt = ntInst.getTable("FMSInfo");
     NetworkTable ballNt = ntInst.getTable("limelight-balls");
     NetworkTable shooterNt = ntInst.getTable("limelight-shooter");
 
-    fmsInfoNt.addEntryListener(
-        "IsRedAlliance",
-        (table, key, entry, value, flags) -> {
-          if (value.getBoolean()) {
-            ballNt.getEntry("pipeline").setNumber(0);
-          } else {
-            ballNt.getEntry("pipeline").setNumber(1);
-          }
-        },
-        Constants.defaultFlags);
+    // add entry listeners to update variables in code from network tables
 
+    // check what alliance color we're on and update limelight to track respective balls
+
+    if (Robot.isRedAlliance) {
+      ballNt.getEntry("pipeline").setNumber(0);
+    } else {
+      ballNt.getEntry("pipeline").setNumber(1);
+    }
+
+    // update ball information
     ballNt.addEntryListener(
         "tx",
         (table, key, entry, value, flags) -> {
-          centerXSteer = value.getDouble();
+          ballXError = value.getDouble();
         },
         Constants.defaultFlags);
 
     ballNt.addEntryListener(
         "tv",
         (table, key, entry, value, flags) -> {
-          isTargetFound = value.getDouble() == 1;
-          isBallFoundEntry.setBoolean(isTargetFound);
+          isBallFound = value.getDouble() == 1;
+          isBallFoundEntry.setBoolean(isBallFound);
         },
         Constants.defaultFlags);
 
+    // update shooter target information
     shooterNt.addEntryListener(
         "tx",
         (table, key, entry, value, flags) -> {
-          drivetrainXSteer = value.getDouble();
+          targetXSteer = value.getDouble();
         },
         Constants.defaultFlags);
 
@@ -113,9 +197,22 @@ public class RobotContainer {
         },
         Constants.defaultFlags);
 
+    // update max speed from dashboard
     maxSpeedEntry.addListener(
         (notification) -> {
           maxSpeed = notification.getEntry().getValue().getDouble();
+        },
+        Constants.defaultFlags);
+
+    // update shooter RPM from dashboard
+    shooterRPMFlywheel1Entry.addListener(
+        (notification) -> {
+          shooterRPMFlywheel1 = notification.getEntry().getValue().getDouble();
+        },
+        Constants.defaultFlags);
+    shooterRPMFlywheel2Entry.addListener(
+        (notification) -> {
+          shooterRPMFlywheel2 = notification.getEntry().getValue().getDouble();
         },
         Constants.defaultFlags);
   }
@@ -128,12 +225,53 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
+    // Driver Driving Bindings
     mDrivetrain.setDefaultCommand(standardGTADriveCommand);
-    oInterface.getAButton().whenPressed(standardBallChaseCommand);
-    oInterface.getBButton().whenPressed(standardGTADriveCommand);
-    oInterface
-        .getLeftBumper()
-        .whenPressed(new AimDrivetrain(() -> (centerXSteer), () -> (yDistance)));
+
+    // Driver Shifting Bindings (not needed for now)
+    // oInterface.getDriveSelectButton().whenPressed(new ShiftToClimb().withTimeout(4));
+    // oInterface.getDriveStartButton().whenPressed(new ShiftToDrive().withTimeout(4));
+
+    // Driver Ball Chasing Bindings
+    oInterface.getDriveAButton().whenPressed(standardBallChaseCommand);
+    oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
+
+    // Aux Manual Turret Control Bindings
+    mTurret.setDefaultCommand(
+        new RunCommand(
+            () -> {
+              mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.2);
+            },
+            mTurret));
+
+    // Aux Ball Chasing Bindings
+    oInterface.getAuxAButton().whenPressed(standardBallChaseCommand);
+    oInterface.getAuxBButton().whenPressed(standardGTADriveCommand);
+
+    // Aux Intake Bindings
+    oInterface.getAuxLeftStickDownButton().whileActiveOnce(new RunIntakeForBall());
+    oInterface.getAuxLeftStickUpButton().whileActiveOnce(new RunIntakeOutForBall());
+
+    // Aux Shooting Bindings
+    oInterface.getAuxRightTriggerButton().whileActiveOnce(new FeedBallToShooter().withTimeout(0.5));
+    oInterface.getAuxLeftTriggerButton().whileActiveOnce(new AimTurret(()->(targetXSteer)));
+    oInterface.getAuxDPadUp().whenPressed(()->{
+      manualRPMAdjust+=10;
+    });
+    oInterface.getAuxDPadDown().whenPressed(()->{
+      manualRPMAdjust-=10;
+    });
+
+    // Limelight Shooter Ranging
+
+    mShooter.setDefaultCommand(
+      new SetShooterPID(
+        () -> ((0.0146*Math.pow(Math.abs(yDistance),3)-(0.2013*Math.pow(Math.abs(yDistance),2))+(27.232*Math.abs(yDistance))+1972.8)+(manualRPMAdjust)),
+        () -> ((2000.))
+        ));
+    
+
+    
   }
 
   /**
@@ -142,7 +280,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return null;
+    // return new TwoBallAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer));
+    return new ComplexAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer));
   }
 }

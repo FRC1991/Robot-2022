@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.DrivetrainCommands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
@@ -9,20 +9,22 @@ public class GTADrive extends CommandBase {
 
   private final Drivetrain drivetrain;
   private final Supplier<Double> forwardSpeed, backwardSpeed, rotation, multiplier;
-  private final Supplier<Boolean> isQuickTurn;
+  private final Supplier<Boolean> isQuickTurn, isClimbing;
 
   public GTADrive(
       Supplier<Double> forwardSpeedSupplier,
       Supplier<Double> backwardSpeedSupplier,
       Supplier<Double> rotationSupplier,
       Supplier<Boolean> isQuickTurnSupplier,
-      Supplier<Double> multiplierSupplier) {
+      Supplier<Double> multiplierSupplier,
+      Supplier<Boolean> isClimbingSupplier) {
     drivetrain = RobotContainer.mDrivetrain;
     forwardSpeed = forwardSpeedSupplier;
     backwardSpeed = backwardSpeedSupplier;
     rotation = rotationSupplier;
     multiplier = multiplierSupplier;
     isQuickTurn = isQuickTurnSupplier;
+    isClimbing = isClimbingSupplier;
     addRequirements(drivetrain);
   }
 
@@ -37,6 +39,11 @@ public class GTADrive extends CommandBase {
         rotation.get(),
         isQuickTurn.get(),
         multiplier.get());
+    if (isClimbing.get()) {
+      drivetrain.setServos(0.39, 0.225);
+    } else {
+      drivetrain.setServos(0.47, 0.16);
+    }
   }
 
   @Override

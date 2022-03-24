@@ -1,36 +1,56 @@
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAlternateEncoder;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class Drivetrain extends SubsystemBase {
-
-  private boolean leftMotor1Inverted = false;
-  private boolean leftMotor2Inverted = false;
-  private boolean rightMotor1Inverted = true;
-  private boolean rightMotor2Inverted = true;
+  private boolean leftMotorInverted = false;
+  private boolean rightMotorInverted = true;
   private DifferentialDrive differentialDrive;
   private double deadband = Constants.globalDeadband;
 
-  private final CANSparkMax leftMotor1, leftMotor2, rightMotor1, rightMotor2;
+  private static CANSparkMax leftMotor1,
+      leftMotor2,
+      leftMotor3,
+      rightMotor1,
+      rightMotor2,
+      rightMotor3;
+  private Servo leftServo, rightServo;
+
+  private final AHRS navx;
 
   public Drivetrain() {
+
+    navx = new AHRS();
+
+    rightServo = new Servo(0);
+    leftServo = new Servo(1);
+
     // define motors with CAN IDs
     leftMotor1 = new CANSparkMax(Constants.leftMotor1, MotorType.kBrushless);
     leftMotor2 = new CANSparkMax(Constants.leftMotor2, MotorType.kBrushless);
+    leftMotor3 = new CANSparkMax(Constants.leftMotor3, MotorType.kBrushless);
     rightMotor1 = new CANSparkMax(Constants.rightMotor1, MotorType.kBrushless);
     rightMotor2 = new CANSparkMax(Constants.rightMotor2, MotorType.kBrushless);
+    rightMotor3 = new CANSparkMax(Constants.rightMotor3, MotorType.kBrushless);
 
-    leftMotor1.setInverted(leftMotor1Inverted);
-    leftMotor2.setInverted(leftMotor2Inverted);
-    rightMotor1.setInverted(rightMotor1Inverted);
-    rightMotor2.setInverted(rightMotor2Inverted);
+    leftMotor1.setInverted(leftMotorInverted);
+    leftMotor2.setInverted(leftMotorInverted);
+    leftMotor3.setInverted(leftMotorInverted);
+    rightMotor1.setInverted(rightMotorInverted);
+    rightMotor2.setInverted(rightMotorInverted);
+    rightMotor3.setInverted(rightMotorInverted);
 
     leftMotor2.follow(leftMotor1);
+    leftMotor3.follow(leftMotor1);
     rightMotor2.follow(rightMotor1);
+    rightMotor3.follow(rightMotor1);
 
     differentialDrive = new DifferentialDrive(leftMotor1, rightMotor1);
   }
@@ -38,6 +58,8 @@ public class Drivetrain extends SubsystemBase {
   public void setDrivetrain(double leftSpeed, double rightSpeed) {
     leftMotor1.set(leftSpeed);
     rightMotor1.set(rightSpeed);
+    rightMotor2.set(rightSpeed);
+    rightMotor3.set(rightSpeed);
   }
 
   public void setDrivetrain(double leftSpeed, double rightSpeed, double multiplier) {
@@ -66,19 +88,19 @@ public class Drivetrain extends SubsystemBase {
       double rotation,
       boolean isQuickTurn,
       double multiplier) {
+
     forwardSpeed = multiplier * forwardSpeed;
     backwardSpeed = -1 * multiplier * backwardSpeed;
     double netSpeed = forwardSpeed + backwardSpeed;
+
     if (Math.abs(netSpeed) > deadband * multiplier) {
-      differentialDrive.curvatureDrive(netSpeed, multiplier * rotation, isQuickTurn);
+      differentialDrive.curvatureDrive(netSpeed, multiplier * -rotation, isQuickTurn);
     } else if (Math.abs(netSpeed) > 0.01 * multiplier) {
-      setDrivetrain(-rotation, rotation, multiplier);
+      setDrivetrain(rotation, rotation, multiplier);
+    } else if (isQuickTurn) {
+      differentialDrive.curvatureDrive(0, -rotation * multiplier, true);
     } else {
-      if (isQuickTurn) {
-        differentialDrive.curvatureDrive(0, rotation * multiplier, true);
-      } else {
-        differentialDrive.curvatureDrive(0, rotation * multiplier * 0.5, true);
-      }
+      differentialDrive.curvatureDrive(0, -rotation * multiplier, true);
     }
   }
 
@@ -90,7 +112,6 @@ public class Drivetrain extends SubsystemBase {
     return leftMotor1.getEncoder().getPosition();
   }
 
-  // get encoder position of left motor 2
   public double getLeftMotor2Pos() {
     return leftMotor2.getEncoder().getPosition();
   }
@@ -99,7 +120,6 @@ public class Drivetrain extends SubsystemBase {
     return rightMotor1.getEncoder().getPosition();
   }
 
-  // get encoder position of right motor 2
   public double getRightMotor2Pos() {
     return rightMotor2.getEncoder().getPosition();
   }
@@ -110,4 +130,110 @@ public class Drivetrain extends SubsystemBase {
     rightMotor1.getEncoder().setPosition(0);
     rightMotor2.getEncoder().setPosition(0);
   }
+
+  public double getYaw() {
+    return navx.getYaw();
+  }
+
+  public double getPitch() {
+    return navx.getPitch();
+  }
+
+  public double getRoll() {
+    return navx.getRoll();
+  }
+
+  public double getHeading() {
+    return navx.getFusedHeading();
+  }
+
+  public double getAngle() {
+    return navx.getAngle();
+  }
+
+  public double getDisplacementX() {
+    return navx.getDisplacementX();
+  }
+
+  public double getDisplacementY() {
+    return navx.getDisplacementY();
+  }
+
+  public double getDisplacementZ() {
+    return navx.getDisplacementZ();
+  }
+
+  public double getVelocityX() {
+    return navx.getVelocityX();
+  }
+
+  public double getVelocityY() {
+    return navx.getVelocityY();
+  }
+
+  public double getVelocityZ() {
+    return navx.getVelocityZ();
+  }
+
+  public double getAccelerationX() {
+    return navx.getWorldLinearAccelX();
+  }
+
+  public double getAccelerationY() {
+    return navx.getWorldLinearAccelY();
+  }
+
+  public double getAccelerationZ() {
+    return navx.getWorldLinearAccelZ();
+  }
+
+  public double getDistanceFeet() {
+    double averageDistanceInRotations =
+        (leftMotor1.getEncoder().getPosition()
+                + leftMotor2.getEncoder().getPosition()
+                + rightMotor1.getEncoder().getPosition()
+                + rightMotor2.getEncoder().getPosition())
+            / 4.0;
+    double averageDistanceInRotationsOfOutputShaft = averageDistanceInRotations / 14.17;
+    return Math.PI
+        * averageDistanceInRotationsOfOutputShaft; // 6 in wheels, so circumfrence in ft is pi
+  }
+
+  public void setServos(double leftServoPosition, double rightServoPosition) {
+    leftServo.set(leftServoPosition);
+    rightServo.set(rightServoPosition);
+  }
+
+  public double getTransverseShaftEncoderPosition() {
+    return rightMotor1
+        .getAlternateEncoder(SparkMaxAlternateEncoder.Type.kQuadrature, 8192)
+        .getPosition();
+  }
+
+  public CANSparkMax getLeftMotor1() {
+    return leftMotor1;
+  }
+
+  
+
+  public CANSparkMax getLeftMotor2() {
+    return leftMotor2;
+  }
+
+  public CANSparkMax getLeftMotor3() {
+    return leftMotor3;
+  }
+
+  public CANSparkMax getRightMotor2() {
+    return rightMotor2;
+  }
+
+  public CANSparkMax getRightMotor3() {
+    return rightMotor3;
+  }
+
+  public CANSparkMax getRightMotor1() {
+    return rightMotor1;
+  }
+
 }

@@ -4,6 +4,11 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -18,7 +23,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
-
+  private NetworkTable ballNt;
+  public static boolean isRedAlliance = false;
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -27,6 +33,13 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
+    isRedAlliance = DriverStation.getAlliance().compareTo(DriverStation.Alliance.Red) == 0;
+    ballNt = NetworkTableInstance.getDefault().getTable("limelight-balls");
+    if (Robot.isRedAlliance) {
+      ballNt.getEntry("pipeline").setNumber(0);
+    } else {
+      ballNt.getEntry("pipeline").setNumber(1);
+    }
     m_robotContainer = new RobotContainer();
   }
 
@@ -56,6 +69,19 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+    isRedAlliance = DriverStation.getAlliance().compareTo(DriverStation.Alliance.Red) == 0;
+    ballNt = NetworkTableInstance.getDefault().getTable("limelight-balls");
+    if (Robot.isRedAlliance) {
+      ballNt.getEntry("pipeline").setNumber(0);
+    } else {
+      ballNt.getEntry("pipeline").setNumber(1);
+    }
+    RobotContainer.mDrivetrain.getLeftMotor1().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mDrivetrain.getLeftMotor2().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mDrivetrain.getLeftMotor3().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mDrivetrain.getRightMotor1().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mDrivetrain.getRightMotor2().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mDrivetrain.getRightMotor3().setIdleMode(IdleMode.kBrake);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -76,6 +102,19 @@ public class Robot extends TimedRobot {
     // this line or comment it out.
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+    }
+    RobotContainer.mDrivetrain.getLeftMotor1().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getLeftMotor2().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getLeftMotor3().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getRightMotor1().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getRightMotor2().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getRightMotor3().setIdleMode(IdleMode.kCoast);
+    isRedAlliance = DriverStation.getAlliance().compareTo(DriverStation.Alliance.Red) == 0;
+    ballNt = NetworkTableInstance.getDefault().getTable("limelight-balls");
+    if (Robot.isRedAlliance) {
+      ballNt.getEntry("pipeline").setNumber(0);
+    } else {
+      ballNt.getEntry("pipeline").setNumber(1);
     }
   }
 
