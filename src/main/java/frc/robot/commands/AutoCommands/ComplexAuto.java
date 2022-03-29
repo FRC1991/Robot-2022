@@ -35,7 +35,7 @@ public class ComplexAuto extends SequentialCommandGroup {
       new RunCommand(()->{RobotContainer.mDrivetrain.setDrivetrain(0.5, -0.5);}, RobotContainer.mDrivetrain).withTimeout(0.5),
       new DriveDistance(2, 1),
       new SetShooterPID(
-        () -> ((0.0146*Math.pow(Math.abs(yDistanceSupplier.get()),3)-(0.2013*Math.pow(Math.abs(yDistanceSupplier.get()),2))+(27.232*Math.abs(yDistanceSupplier.get()))+1972.8)),
+        () -> (SetShooterPID.rangeWithLimelight(yDistanceSupplier)),
         () -> (2000.)
         ).withTimeout(2),
         new AimTurret(targetXSteerSupplier).withTimeout(1),
