@@ -17,17 +17,17 @@ public class BallChase extends CommandBase {
   private OperatingInterface oInterface = RobotContainer.oInterface;
   private final double steeringScale = Constants.kPForVision;
   private double steeringAdjust = 0;
-  private Supplier<Double> xSteer;
-  private double speed = 1;
+  private Supplier<Double> xSteer, speed;
 
   public BallChase(Supplier<Double> xSteerSupplier) {
     drivetrain = RobotContainer.mDrivetrain;
     intake = RobotContainer.mIntake;
     addRequirements(drivetrain);
     xSteer = xSteerSupplier;
+    speed = () -> (0.1);
   }
 
-  public BallChase(Supplier<Double> xSteerSupplier, double speed) {
+  public BallChase(Supplier<Double> xSteerSupplier, Supplier<Double> speed) {
     drivetrain = RobotContainer.mDrivetrain;
     intake = RobotContainer.mIntake;
     addRequirements(drivetrain);
@@ -61,7 +61,7 @@ public class BallChase extends CommandBase {
     } else {
       steeringAdjust = 0;
     }
-    drivetrain.arcadeDrive(-speed, -steeringAdjust);
+    drivetrain.arcadeDrive(-speed.get(), -steeringAdjust);
     // System.out.println("Ball Chase Output to Drive " + steeringAdjust);
 
     intake.setIntakeMotor1(-0.5);

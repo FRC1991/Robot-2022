@@ -76,6 +76,7 @@ public class RobotContainer {
           () -> (maxSpeed),
           oInterface.getDriveXButton()::get);
   BallChase standardBallChaseCommand = new BallChase(() -> (ballXError));
+  BallChase triggerAccelBalChaseCommand = new BallChase(() -> (ballXError), oInterface::getDriveRightTriggerAxis);
   SetShooterPID dashboardBasedShooterRPMCommand =
       new SetShooterPID(() -> (shooterRPMFlywheel1), () -> (shooterRPMFlywheel2));
 
@@ -238,7 +239,7 @@ public class RobotContainer {
     // oInterface.getDriveStartButton().whenPressed(new ShiftToDrive().withTimeout(4));
 
     // Driver Ball Chasing Bindings
-    oInterface.getDriveAButton().whenPressed(standardBallChaseCommand);
+    oInterface.getDriveAButton().whenPressed(triggerAccelBalChaseCommand);
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
 
     // Aux Manual Turret Control Bindings
