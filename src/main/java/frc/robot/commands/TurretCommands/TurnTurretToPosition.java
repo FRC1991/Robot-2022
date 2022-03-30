@@ -4,11 +4,10 @@
 
 package frc.robot.commands.TurretCommands;
 
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Turret;
+import java.util.function.Supplier;
 
 public class TurnTurretToPosition extends CommandBase {
 
@@ -17,7 +16,8 @@ public class TurnTurretToPosition extends CommandBase {
   double initialPosition, currentPosition;
 
   /** Creates a new TurnTurretToPosition. */
-  public TurnTurretToPosition(Supplier<Double> targetPositionSupplier, Supplier<Double> speedSupplier) {
+  public TurnTurretToPosition(
+      Supplier<Double> targetPositionSupplier, Supplier<Double> speedSupplier) {
     // Use addRequirements() here to declare subsystem dependencies.
     turret = RobotContainer.mTurret;
     targetPosition = targetPositionSupplier;
@@ -35,9 +35,9 @@ public class TurnTurretToPosition extends CommandBase {
   @Override
   public void execute() {
     currentPosition = turret.getTurretPosition();
-    if(targetPosition.get() > 0){
+    if (targetPosition.get() > 0) {
       turret.setTurret(speed.get() * Math.abs(targetPosition.get() - currentPosition));
-    } else{
+    } else {
       turret.setTurret(-speed.get() * Math.abs(targetPosition.get() - currentPosition));
     }
   }

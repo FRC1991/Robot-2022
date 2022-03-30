@@ -214,8 +214,6 @@ public class Drivetrain extends SubsystemBase {
     return leftMotor1;
   }
 
-  
-
   public CANSparkMax getLeftMotor2() {
     return leftMotor2;
   }
@@ -235,5 +233,4 @@ public class Drivetrain extends SubsystemBase {
   public CANSparkMax getRightMotor1() {
     return rightMotor1;
   }
-
 }

@@ -15,9 +15,6 @@ public class DriveDistanceUntilCapture extends ParallelRaceGroup {
   public DriveDistanceUntilCapture(double distance, double speed) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(
-      new DriveDistance(distance, speed),
-      new RunIntakeForBall()
-    );
+    addCommands(new DriveDistance(distance, speed), new RunIntakeForBall());
   }
 }
