@@ -40,7 +40,7 @@ import java.util.Map;
  */
 public class RobotContainer {
   // The robot's subsystems, commands, and global variables are defined here
-  
+
   public static Drivetrain mDrivetrain = new Drivetrain();
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
@@ -144,8 +144,12 @@ public class RobotContainer {
     // Shuffleboard.getTab("Main").add(limelightBallCamera);
 
     autonomousChooser = new SendableChooser<Command>();
-    autonomousChooser.setDefaultOption("Two Ball Auto", new TwoBallAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer)));
-    autonomousChooser.addOption("Complex Auto", new ComplexAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer)));
+    autonomousChooser.setDefaultOption(
+        "Two Ball Auto",
+        new TwoBallAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer)));
+    autonomousChooser.addOption(
+        "Complex Auto",
+        new ComplexAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer)));
   }
 
   /*
@@ -255,23 +259,24 @@ public class RobotContainer {
 
     // Aux Shooting Bindings
     oInterface.getAuxRightTriggerButton().whileActiveOnce(new FeedBallToShooter().withTimeout(0.5));
-    oInterface.getAuxLeftTriggerButton().whileActiveOnce(new AimTurret(()->(targetXSteer)));
-    oInterface.getAuxDPadUp().whenPressed(()->{
-      manualRPMAdjust+=10;
-    });
-    oInterface.getAuxDPadDown().whenPressed(()->{
-      manualRPMAdjust-=10;
-    });
+    oInterface.getAuxLeftTriggerButton().whileActiveOnce(new AimTurret(() -> (targetXSteer)));
+    oInterface
+        .getAuxDPadUp()
+        .whenPressed(
+            () -> {
+              manualRPMAdjust += 10;
+            });
+    oInterface
+        .getAuxDPadDown()
+        .whenPressed(
+            () -> {
+              manualRPMAdjust -= 10;
+            });
 
     // Limelight Shooter Ranging
     mShooter.setDefaultCommand(
-      new SetShooterPID(
-        () -> (SetShooterPID.rangeWithLimelight(()->(yDistance))),
-        () -> (2000.)
-        ));
-    
-
-    
+        new SetShooterPID(
+            () -> (SetShooterPID.rangeWithLimelight(() -> (yDistance))), () -> (2000.)));
   }
 
   /**
@@ -281,6 +286,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return new TwoBallAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer));
-    return new ComplexAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer));
+    return new ComplexAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer));
   }
 }

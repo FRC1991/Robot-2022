@@ -23,11 +23,10 @@ public class Intake extends SubsystemBase {
   }
 
   public void setIntakeMotor2(double speed) {
-      intakeMotor2.set(speed);
+    intakeMotor2.set(speed);
   }
-  
+
   public boolean isBallIn() {
     return proximitySensor.get();
   }
-
 }
