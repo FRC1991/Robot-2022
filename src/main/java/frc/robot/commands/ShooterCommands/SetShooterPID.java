@@ -40,4 +40,8 @@ public class SetShooterPID extends CommandBase {
     // mShooter.setMainFlywheel2(0);
     // mShooter.setSecondaryFlywheel(0);
   }
+
+  public static double rangeWithLimelight(Supplier<Double> yDistanceSupplier) {
+    return 0.0146*Math.pow(Math.abs(yDistanceSupplier.get()),3)-(0.2013*Math.pow(Math.abs(yDistanceSupplier.get()),2))+(27.232*Math.abs(yDistanceSupplier.get()))+1972.8;
+  }
 }

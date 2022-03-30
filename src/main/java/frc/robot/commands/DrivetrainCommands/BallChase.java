@@ -1,6 +1,7 @@
 package frc.robot.commands.DrivetrainCommands;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.OperatingInterface.OperatingInterface;
@@ -36,7 +37,8 @@ public class BallChase extends CommandBase {
 
   @Override
   public void initialize() {
-    oInterface.singleVibrateDrive();
+    // oInterface.singleVibrateDrive();
+    oInterface.driveJoystick.setRumble(RumbleType.kRightRumble, 1);
     NetworkTableInstance.getDefault()
         .getTable("Shuffleboard")
         .getSubTable("Main")
@@ -77,7 +79,8 @@ public class BallChase extends CommandBase {
     // let driver know they have control again and update network tables
     intake.setIntakeMotor1(0);
     intake.setIntakeMotor2(0);
-    oInterface.doubleVibrateDrive();
+    // oInterface.doubleVibrateDrive();
+    oInterface.driveJoystick.setRumble(RumbleType.kRightRumble, 0);
     NetworkTableInstance.getDefault()
         .getTable("Shuffleboard")
         .getSubTable("Main")

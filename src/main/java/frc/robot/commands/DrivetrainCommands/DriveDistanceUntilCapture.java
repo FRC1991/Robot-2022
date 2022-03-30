@@ -10,9 +10,9 @@ import frc.robot.commands.IntakeCommands.RunIntakeForBall;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class DriveDistanceAndCapture extends ParallelRaceGroup {
+public class DriveDistanceUntilCapture extends ParallelRaceGroup {
   /** Creates a new DriveDistanceAndCapture. */
-  public DriveDistanceAndCapture(double distance, double speed) {
+  public DriveDistanceUntilCapture(double distance, double speed) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(

@@ -20,7 +20,6 @@ import frc.robot.commands.AutoCommands.ComplexAuto;
 import frc.robot.commands.AutoCommands.TwoBallAuto;
 import frc.robot.commands.DrivetrainCommands.BallChase;
 import frc.robot.commands.DrivetrainCommands.GTADrive;
-import frc.robot.commands.DrivetrainCommands.TurnGyro;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
 import frc.robot.commands.IntakeCommands.RunIntakeForBall;
 import frc.robot.commands.IntakeCommands.RunIntakeOutForBall;
@@ -263,11 +262,10 @@ public class RobotContainer {
     });
 
     // Limelight Shooter Ranging
-
     mShooter.setDefaultCommand(
       new SetShooterPID(
-        () -> ((0.0146*Math.pow(Math.abs(yDistance),3)-(0.2013*Math.pow(Math.abs(yDistance),2))+(27.232*Math.abs(yDistance))+1972.8)+(manualRPMAdjust)),
-        () -> ((2000.))
+        () -> (SetShooterPID.rangeWithLimelight(()->(yDistance))),
+        () -> (2000.)
         ));
     
 
