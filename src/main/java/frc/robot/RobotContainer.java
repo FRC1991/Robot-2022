@@ -25,6 +25,7 @@ import frc.robot.commands.IntakeCommands.RunIntakeForBall;
 import frc.robot.commands.IntakeCommands.RunIntakeOutForBall;
 import frc.robot.commands.ShooterCommands.SetShooterPID;
 import frc.robot.commands.TurretCommands.AimTurret;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -39,12 +40,13 @@ import java.util.Map;
  */
 public class RobotContainer {
   // The robot's subsystems, commands, and global variables are defined here
-
+  
   public static Drivetrain mDrivetrain = new Drivetrain();
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
   public static Shooter mShooter = new Shooter();
   public static Turret mTurret = new Turret();
+  public static Climber mClimber = new Climber();
   public static double ballXError,
       targetXSteer,
       yDistance,
