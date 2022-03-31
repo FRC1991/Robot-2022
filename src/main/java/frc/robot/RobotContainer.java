@@ -25,6 +25,7 @@ import frc.robot.commands.IntakeCommands.RunIntakeForBall;
 import frc.robot.commands.IntakeCommands.RunIntakeOutForBall;
 import frc.robot.commands.ShooterCommands.SetShooterPID;
 import frc.robot.commands.TurretCommands.AimTurret;
+import frc.robot.commands.TurretCommands.SetHoodAngle;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Intake;
@@ -76,7 +77,8 @@ public class RobotContainer {
           () -> (maxSpeed),
           oInterface.getDriveXButton()::get);
   BallChase standardBallChaseCommand = new BallChase(() -> (ballXError));
-  BallChase triggerAccelBalChaseCommand = new BallChase(() -> (ballXError), oInterface::getDriveRightTriggerAxis);
+  BallChase triggerAccelBalChaseCommand =
+      new BallChase(() -> (ballXError), oInterface::getDriveRightTriggerAxis);
   SetShooterPID dashboardBasedShooterRPMCommand =
       new SetShooterPID(() -> (shooterRPMFlywheel1), () -> (shooterRPMFlywheel2));
 
@@ -123,12 +125,12 @@ public class RobotContainer {
             .withProperties(Map.of("min", 0, "max", 20000))
             .getEntry();
 
-    // hoodAngleEntry =
-    // Shuffleboard.getTab("Main")
-    // .add("Hood Angle", 0)
-    // .withWidget(BuiltInWidgets.kNumberSlider)
-    // .withProperties(Map.of("min", 0, "max", 55))
-    // .getEntry();
+    hoodAngleEntry =
+        Shuffleboard.getTab("Main")
+            .add("Hood Angle", 0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 55))
+            .getEntry();
     measuredRPMFlywheel1Entry =
         Shuffleboard.getTab("Main")
             .add("Flywheel 1", 0)
@@ -221,6 +223,12 @@ public class RobotContainer {
           shooterRPMFlywheel2 = notification.getEntry().getValue().getDouble();
         },
         Constants.defaultFlags);
+
+    hoodAngleEntry.addListener(
+        (notification) -> {
+          hoodAngle = notification.getEntry().getValue().getDouble();
+        },
+        Constants.defaultFlags);
   }
 
   /**
@@ -243,12 +251,13 @@ public class RobotContainer {
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
 
     // Aux Manual Turret Control Bindings
-    mTurret.setDefaultCommand(
-        new RunCommand(
-            () -> {
-              mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.2);
-            },
-            mTurret));
+    // mTurret.setDefaultCommand(
+    //     new RunCommand(
+    //         () -> {
+    //           mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.2);
+    //           mTurret.setHood(oInterface.getAuxRightYAxis() * 0.7);
+    //         },
+    //         mTurret));
 
     // Aux Ball Chasing Bindings
     oInterface.getAuxAButton().whenPressed(standardBallChaseCommand);
@@ -275,9 +284,13 @@ public class RobotContainer {
             });
 
     // Limelight Shooter Ranging
-    mShooter.setDefaultCommand(
-        new SetShooterPID(
-            () -> (SetShooterPID.rangeWithLimelight(() -> (yDistance))), () -> (2000.)));
+    // mShooter.setDefaultCommand(
+    // new SetShooterPID(
+    // () -> (SetShooterPID.rangeWithLimelight(() -> (yDistance))), () -> (2000.)));
+
+    // DOE Bindings
+    mShooter.setDefaultCommand(dashboardBasedShooterRPMCommand);
+    oInterface.getAuxXButton().whenPressed(new SetHoodAngle(() -> (hoodAngle)));
   }
 
   /**

@@ -32,7 +32,8 @@ public final class Constants {
   public static final double GTADriveMultiplier = 1;
   public static final double tankDriveMultiplier = 2;
   public static final double kPForVision = 2.3;
-  public static final int proximitySensorDIOIndex = 0;
+  public static final int proximitySensorInnerDIOIndex = 0;
+  public static final int proximitySensorOuterDIOIndex = 1;
   public static final double globalDeadband = 0.1;
   public static final double kPFlywheel1 = 0.00026666;
   public static final double kIFlywheel1 = 0.000000632;

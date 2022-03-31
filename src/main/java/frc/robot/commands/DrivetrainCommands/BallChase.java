@@ -71,7 +71,7 @@ public class BallChase extends CommandBase {
   @Override
   public boolean isFinished() {
     // if ball is captured, finish command
-    return intake.isBallIn();
+    return intake.isBallPresentInner();
   }
 
   @Override
