@@ -29,6 +29,7 @@ public final class Constants {
   public static final int mainFlywheelMotor2 = 10;
   public static final int secondaryFlywheel = 11;
   public static final int elevatorRaiseMotor = 8;
+  public static final int pigeonIMU = 20;
   public static final double GTADriveMultiplier = 1;
   public static final double tankDriveMultiplier = 2;
   public static final double kPForVision = 2.3;

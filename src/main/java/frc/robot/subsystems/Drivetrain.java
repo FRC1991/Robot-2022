@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
+// import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAlternateEncoder;
@@ -23,11 +25,16 @@ public class Drivetrain extends SubsystemBase {
       rightMotor3;
   private Servo leftServo, rightServo;
 
-  private final AHRS navx;
+  // private final AHRS navx;
+  private final Pigeon2 pigeon;
 
   public Drivetrain() {
 
-    navx = new AHRS();
+    // navx = new AHRS();
+    pigeon = new Pigeon2(Constants.pigeonIMU);
+
+    pigeon.configMountPose(AxisDirection.NegativeY, AxisDirection.PositiveZ);
+    pigeon.setYaw(0);
 
     rightServo = new Servo(0);
     leftServo = new Servo(1);
@@ -132,60 +139,73 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getYaw() {
-    return navx.getYaw();
+    return pigeon.getYaw();
   }
 
   public double getPitch() {
-    return navx.getPitch();
+    return pigeon.getPitch();
   }
 
   public double getRoll() {
-    return navx.getRoll();
+    return pigeon.getRoll();
   }
+  
 
-  public double getHeading() {
-    return navx.getFusedHeading();
-  }
+  // public double getYaw() {
+  //   return navx.getYaw();
+  // }
 
-  public double getAngle() {
-    return navx.getAngle();
-  }
+  // public double getPitch() {
+  //   return navx.getPitch();
+  // }
 
-  public double getDisplacementX() {
-    return navx.getDisplacementX();
-  }
+  // public double getRoll() {
+  //   return navx.getRoll();
+  // }
 
-  public double getDisplacementY() {
-    return navx.getDisplacementY();
-  }
+  // public double getHeading() {
+  //   return navx.getFusedHeading();
+  // }
 
-  public double getDisplacementZ() {
-    return navx.getDisplacementZ();
-  }
+  // public double getAngle() {
+  //   return navx.getAngle();
+  // }
 
-  public double getVelocityX() {
-    return navx.getVelocityX();
-  }
+  // public double getDisplacementX() {
+  //   return navx.getDisplacementX();
+  // }
 
-  public double getVelocityY() {
-    return navx.getVelocityY();
-  }
+  // public double getDisplacementY() {
+  //   return navx.getDisplacementY();
+  // }
 
-  public double getVelocityZ() {
-    return navx.getVelocityZ();
-  }
+  // public double getDisplacementZ() {
+  //   return navx.getDisplacementZ();
+  // }
 
-  public double getAccelerationX() {
-    return navx.getWorldLinearAccelX();
-  }
+  // public double getVelocityX() {
+  //   return navx.getVelocityX();
+  // }
 
-  public double getAccelerationY() {
-    return navx.getWorldLinearAccelY();
-  }
+  // public double getVelocityY() {
+  //   return navx.getVelocityY();
+  // }
 
-  public double getAccelerationZ() {
-    return navx.getWorldLinearAccelZ();
-  }
+  // public double getVelocityZ() {
+  //   return navx.getVelocityZ();
+  // }
+
+  // public double getAccelerationX() {
+  //   return navx.getWorldLinearAccelX();
+  // }
+
+  // public double getAccelerationY() {
+  //   return navx.getWorldLinearAccelY();
+  // }
+
+  // public double getAccelerationZ() {
+  //   return navx.getWorldLinearAccelZ();
+  // }
 
   public double getDistanceFeet() {
     double averageDistanceInRotations =
