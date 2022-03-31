@@ -8,11 +8,12 @@ import frc.robot.Constants;
 
 public class Intake extends SubsystemBase {
 
-  public static DigitalInput proximitySensor;
+  public static DigitalInput proximitySensorInner, proximitySensorOuter;
   private final CANSparkMax intakeMotor1, intakeMotor2;
 
   public Intake() {
-    proximitySensor = new DigitalInput(Constants.proximitySensorDIOIndex);
+    proximitySensorInner = new DigitalInput(Constants.proximitySensorInnerDIOIndex);
+    proximitySensorOuter = new DigitalInput(Constants.proximitySensorOuterDIOIndex);
     intakeMotor1 = new CANSparkMax(Constants.intakeMotor1, MotorType.kBrushless);
     intakeMotor2 = new CANSparkMax(Constants.intakeMotor2, MotorType.kBrushless);
     intakeMotor1.setInverted(true);
@@ -26,7 +27,11 @@ public class Intake extends SubsystemBase {
     intakeMotor2.set(speed);
   }
 
-  public boolean isBallIn() {
-    return proximitySensor.get();
+  public boolean isBallPresentInner() {
+    return proximitySensorInner.get();
+  }
+
+  public boolean isBallPresentOuter() {
+    return proximitySensorOuter.get();
   }
 }

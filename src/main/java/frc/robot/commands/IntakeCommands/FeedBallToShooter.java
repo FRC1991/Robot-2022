@@ -6,6 +6,7 @@ import frc.robot.subsystems.Intake;
 
 public class FeedBallToShooter extends CommandBase {
   Intake intake;
+  boolean isFirstBallInAlready;
 
   public FeedBallToShooter() {
     intake = RobotContainer.mIntake;
@@ -15,6 +16,7 @@ public class FeedBallToShooter extends CommandBase {
   @Override
   public void initialize() {
     System.out.println("Shot Taken!\nLL Distance at: " + RobotContainer.yDistance);
+    isFirstBallInAlready = intake.isBallPresentInner();
   }
 
   @Override
@@ -24,6 +26,7 @@ public class FeedBallToShooter extends CommandBase {
 
   @Override
   public boolean isFinished() {
+    if (isFirstBallInAlready) return intake.isBallPresentInner();
     return false;
   }
 
