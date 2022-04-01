@@ -20,6 +20,7 @@ import frc.robot.commands.AutoCommands.ComplexAuto;
 import frc.robot.commands.AutoCommands.TwoBallAuto;
 import frc.robot.commands.DrivetrainCommands.BallChase;
 import frc.robot.commands.DrivetrainCommands.GTADrive;
+import frc.robot.commands.DrivetrainCommands.TurnGyro;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
 import frc.robot.commands.IntakeCommands.RunIntakeForBall;
 import frc.robot.commands.IntakeCommands.RunIntakeOutForBall;
@@ -255,7 +256,7 @@ public class RobotContainer {
     //     new RunCommand(
     //         () -> {
     //           mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.2);
-    //           mTurret.setHood(oInterface.getAuxRightYAxis() * 0.7);
+    //           mTurret.setHood(oInterface.getAuxRightYAxis() * 0.5);
     //         },
     //         mTurret));
 
@@ -300,6 +301,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return new TwoBallAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer));
-    return new ComplexAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer));
+    // return new ComplexAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer));
+    return new TurnGyro(72, 0.5);
   }
 }
