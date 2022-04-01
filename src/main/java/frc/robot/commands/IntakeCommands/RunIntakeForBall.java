@@ -7,7 +7,6 @@ import frc.robot.subsystems.Intake;
 public class RunIntakeForBall extends CommandBase {
 
   Intake intake;
-  public boolean isFirstBallInAlready;
 
   public RunIntakeForBall() {
     intake = RobotContainer.mIntake;
@@ -15,19 +14,17 @@ public class RunIntakeForBall extends CommandBase {
   }
 
   @Override
-  public void initialize() {
-    isFirstBallInAlready = intake.isBallPresentInner();
-  }
+  public void initialize() {}
 
   @Override
   public void execute() {
     intake.setIntakeMotor1(-0.8);
+    intake.setIntakeMotor2(0.8);
   }
 
   @Override
   public boolean isFinished() {
-    if (isFirstBallInAlready) return intake.isBallPresentOuter();
-    else return intake.isBallPresentInner();
+    return intake.isBallPresentInner();
   }
 
   @Override

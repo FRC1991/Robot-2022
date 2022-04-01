@@ -16,12 +16,12 @@ public class TwoBallAuto extends SequentialCommandGroup {
         new SetShooterPID(
                 () -> (SetShooterPID.rangeWithLimelight(yDistanceSupplier)), () -> (2000.))
             .withTimeout(2.3),
-        new FeedBallToShooter().withTimeout(0.5),
+        new FeedBallToShooter().withTimeout(0.2),
         new DriveDistanceUntilCapture(10, -0.9),
         new SetShooterPID(
                 () -> (SetShooterPID.rangeWithLimelight(yDistanceSupplier)), () -> (2000.))
-            .withTimeout(1),
+            .withTimeout(0.5),
         new AimTurret(targetXErrorSupplier).withTimeout(1),
-        new FeedBallToShooter().withTimeout(0.5));
+        new FeedBallToShooter().withTimeout(0.2));
   }
 }
