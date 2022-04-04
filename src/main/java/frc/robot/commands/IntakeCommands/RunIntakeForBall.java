@@ -1,5 +1,6 @@
 package frc.robot.commands.IntakeCommands;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Intake;
@@ -14,7 +15,9 @@ public class RunIntakeForBall extends CommandBase {
   }
 
   @Override
-  public void initialize() {}
+  public void initialize() {
+    NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Main").getEntry("Ball In").setBoolean(false);
+  }
 
   @Override
   public void execute() {
@@ -31,5 +34,6 @@ public class RunIntakeForBall extends CommandBase {
   public void end(boolean interrupted) {
     intake.setIntakeMotor1(0);
     intake.setIntakeMotor2(0);
+    NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Main").getEntry("Ball In").setBoolean(true);
   }
 }

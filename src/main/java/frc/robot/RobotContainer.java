@@ -14,7 +14,9 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.OperatingInterface.OperatingInterface;
 import frc.robot.commands.AutoCommands.ComplexAuto;
 import frc.robot.commands.AutoCommands.TwoBallAuto;
@@ -64,7 +66,8 @@ public class RobotContainer {
       shooterRPMFlywheel1Entry,
       shooterRPMFlywheel2Entry,
       hoodAngleEntry,
-      isTargetFoundEntry;
+      isTargetFoundEntry,
+      isBallInEntry;
   public static NetworkTableEntry measuredRPMFlywheel1Entry, measuredRPMFlywheel2Entry;
 
   SendableChooser<Command> autonomousChooser;
@@ -79,7 +82,7 @@ public class RobotContainer {
           oInterface.getDriveXButton()::get);
   BallChase standardBallChaseCommand = new BallChase(() -> (ballXError));
   BallChase triggerAccelBalChaseCommand =
-      new BallChase(() -> (ballXError), oInterface::getDriveRightTriggerAxis);
+      new BallChase(() -> (ballXError), oInterface::getDriveLeftTriggerAxis);
   SetShooterPID dashboardBasedShooterRPMCommand =
       new SetShooterPID(() -> (shooterRPMFlywheel1), () -> (shooterRPMFlywheel2));
 
@@ -103,7 +106,7 @@ public class RobotContainer {
   private void dashboardInit() {
     isChasingBallEntry = Shuffleboard.getTab("Main").add("Chasing Ball", isChasingBall).getEntry();
     isBallFoundEntry = Shuffleboard.getTab("Main").add("Ball Found", isBallFound).getEntry();
-
+    isBallInEntry = Shuffleboard.getTab("Main").add("Ball In", false).getEntry();
     isTargetFoundEntry =
         Shuffleboard.getTab("Main").add("Shot Target Found", isTargetFound).getEntry();
 
@@ -252,13 +255,13 @@ public class RobotContainer {
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
 
     // Aux Manual Turret Control Bindings
-    // mTurret.setDefaultCommand(
-    //     new RunCommand(
-    //         () -> {
-    //           mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.2);
-    //           mTurret.setHood(oInterface.getAuxRightYAxis() * 0.5);
-    //         },
-    //         mTurret));
+    mTurret.setDefaultCommand(
+        new RunCommand(
+            () -> {
+              mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.2);
+              // mTurret.setHood(oInterface.getAuxRightYAxis() * 0.2);
+            },
+            mTurret));
 
     // Aux Ball Chasing Bindings
     oInterface.getAuxAButton().whenPressed(standardBallChaseCommand);
@@ -269,7 +272,14 @@ public class RobotContainer {
     oInterface.getAuxLeftStickUpButton().whileActiveOnce(new RunIntakeOutForBall());
 
     // Aux Shooting Bindings
-    oInterface.getAuxRightTriggerButton().whileActiveOnce(new FeedBallToShooter().withTimeout(0.5));
+    oInterface
+        .getAuxRightTriggerButton()
+        .whenPressed(
+            new SequentialCommandGroup(
+                new PrintCommand(
+                    Double.toString(SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
+                new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
+                new FeedBallToShooter().withTimeout(0.3)));
     oInterface.getAuxLeftTriggerButton().whileActiveOnce(new AimTurret(() -> (targetXSteer)));
     oInterface
         .getAuxDPadUp()
@@ -285,12 +295,13 @@ public class RobotContainer {
             });
 
     // Limelight Shooter Ranging
-    // mShooter.setDefaultCommand(
-    // new SetShooterPID(
-    // () -> (SetShooterPID.rangeWithLimelight(() -> (yDistance))), () -> (2000.)));
+    mShooter.setDefaultCommand(
+        new SetShooterPID(
+            () -> (SetShooterPID.rangeRPM1WithLL(() -> (yDistance)*1.15)),
+            () -> (SetShooterPID.rangeRPM2WithLL(() -> (yDistance)))));
 
     // DOE Bindings
-    mShooter.setDefaultCommand(dashboardBasedShooterRPMCommand);
+    // mShooter.setDefaultCommand(dashboardBasedShooterRPMCommand);
     oInterface.getAuxXButton().whenPressed(new SetHoodAngle(() -> (hoodAngle)));
   }
 
@@ -301,7 +312,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return new TwoBallAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer));
-    // return new ComplexAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer));
-    return new TurnGyro(72, 0.5);
+    return new ComplexAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer));
+    // return new TurnGyro(80, 0.5);
   }
 }

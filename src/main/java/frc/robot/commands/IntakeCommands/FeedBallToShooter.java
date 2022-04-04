@@ -1,5 +1,6 @@
 package frc.robot.commands.IntakeCommands;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Intake;
@@ -14,7 +15,7 @@ public class FeedBallToShooter extends CommandBase {
 
   @Override
   public void initialize() {
-    System.out.println("Shot Taken!\nLL Distance at: "+RobotContainer.yDistance);
+    System.out.println("Shot Taken!\nLL Distance at: " + RobotContainer.yDistance);
   }
 
   @Override
@@ -31,5 +32,6 @@ public class FeedBallToShooter extends CommandBase {
   public void end(boolean interrupted) {
     intake.setIntakeMotor1(0);
     intake.setIntakeMotor2(0);
+    NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Main").getEntry("Ball In").setBoolean(false);
   }
 }

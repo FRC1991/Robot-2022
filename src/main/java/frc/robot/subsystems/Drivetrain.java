@@ -149,63 +149,6 @@ public class Drivetrain extends SubsystemBase {
   public double getRoll() {
     return pigeon.getRoll();
   }
-  
-
-  // public double getYaw() {
-  //   return navx.getYaw();
-  // }
-
-  // public double getPitch() {
-  //   return navx.getPitch();
-  // }
-
-  // public double getRoll() {
-  //   return navx.getRoll();
-  // }
-
-  // public double getHeading() {
-  //   return navx.getFusedHeading();
-  // }
-
-  // public double getAngle() {
-  //   return navx.getAngle();
-  // }
-
-  // public double getDisplacementX() {
-  //   return navx.getDisplacementX();
-  // }
-
-  // public double getDisplacementY() {
-  //   return navx.getDisplacementY();
-  // }
-
-  // public double getDisplacementZ() {
-  //   return navx.getDisplacementZ();
-  // }
-
-  // public double getVelocityX() {
-  //   return navx.getVelocityX();
-  // }
-
-  // public double getVelocityY() {
-  //   return navx.getVelocityY();
-  // }
-
-  // public double getVelocityZ() {
-  //   return navx.getVelocityZ();
-  // }
-
-  // public double getAccelerationX() {
-  //   return navx.getWorldLinearAccelX();
-  // }
-
-  // public double getAccelerationY() {
-  //   return navx.getWorldLinearAccelY();
-  // }
-
-  // public double getAccelerationZ() {
-  //   return navx.getWorldLinearAccelZ();
-  // }
 
   public double getDistanceFeet() {
     double averageDistanceInRotations =
