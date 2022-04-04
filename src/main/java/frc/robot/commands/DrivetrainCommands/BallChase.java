@@ -24,7 +24,7 @@ public class BallChase extends CommandBase {
     intake = RobotContainer.mIntake;
     addRequirements(drivetrain);
     xSteer = xSteerSupplier;
-    speed = () -> (0.1);
+    speed = () -> (0.93);
   }
 
   public BallChase(Supplier<Double> xSteerSupplier, Supplier<Double> speed) {
@@ -64,8 +64,8 @@ public class BallChase extends CommandBase {
     drivetrain.arcadeDrive(-speed.get(), -steeringAdjust);
     // System.out.println("Ball Chase Output to Drive " + steeringAdjust);
 
-    intake.setIntakeMotor1(-0.5);
-    intake.setIntakeMotor2(0.5);
+    intake.setIntakeMotor1(-0.8);
+    intake.setIntakeMotor2(0.8);
   }
 
   @Override

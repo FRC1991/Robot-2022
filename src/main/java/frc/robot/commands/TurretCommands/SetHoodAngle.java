@@ -33,12 +33,28 @@ public class SetHoodAngle extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    System.out.println(Math.abs(hoodAngle.get() - turret.getHoodPosition()));
+    // System.out.println(Math.abs(hoodAngle.get() - turret.getHoodPosition()));
     return Math.abs(hoodAngle.get() - turret.getHoodPosition()) <= 0.5;
   }
 
   @Override
   public void end(boolean interrupted) {
     turret.setHood(0);
+  }
+
+  public static double rangeHoodAngleWithLL(double yDistanceSupplier) {
+    // return (0.00001 * Math.pow(yDistanceSupplier, 5))
+    //     - (0.0011 * Math.pow(yDistanceSupplier, 4))
+    //     + (0.0318 * Math.pow(yDistanceSupplier, 3))
+    //     - (0.3025 * Math.pow(yDistanceSupplier, 2))
+    //     + (0.9527 * yDistanceSupplier)
+    //     - (0.0202);
+    return -0.0072
+        + 0.69 * yDistanceSupplier
+        - 0.238 * Math.pow(yDistanceSupplier, 2)
+        + 0.0262 * Math.pow(yDistanceSupplier, 3)
+        - 0.000917 * Math.pow(yDistanceSupplier, 4)
+        + 0.00000983 * Math.pow(yDistanceSupplier, 5)
+        + 0.0000000175 * Math.pow(yDistanceSupplier, 6);
   }
 }
