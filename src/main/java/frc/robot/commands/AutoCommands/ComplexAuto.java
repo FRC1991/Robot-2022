@@ -4,19 +4,13 @@
 
 package frc.robot.commands.AutoCommands;
 
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.RobotContainer;
 import frc.robot.commands.DrivetrainCommands.BallChase;
 import frc.robot.commands.DrivetrainCommands.DriveDistance;
-import frc.robot.commands.DrivetrainCommands.DriveDistanceUntilCapture;
 import frc.robot.commands.DrivetrainCommands.TurnGyro;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
-import frc.robot.commands.ShooterCommands.SetShooterPID;
 import frc.robot.commands.TurretCommands.AimTurret;
 import frc.robot.commands.TurretCommands.SetHoodAngle;
-
 import java.util.function.Supplier;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
@@ -36,13 +30,14 @@ public class ComplexAuto extends SequentialCommandGroup {
         new BallChase(xSteerSupplier),
         new TurnGyro(25, 0.5),
         new AimTurret(targetXErrorSupplier).withTimeout(1.5),
-        new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
+        new SetHoodAngle(
+            () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
         new FeedBallToShooter().withTimeout(0.3),
-        new BallChase(xSteerSupplier, ()->(1.)),
+        new BallChase(xSteerSupplier, () -> (1.)),
         new DriveDistance(30, 0.9),
         new AimTurret(targetXErrorSupplier).withTimeout(1.5),
-        new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
-        new FeedBallToShooter().withTimeout(0.3)
-        );
+        new SetHoodAngle(
+            () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
+        new FeedBallToShooter().withTimeout(0.3));
   }
 }
