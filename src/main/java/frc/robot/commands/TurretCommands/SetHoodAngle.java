@@ -42,19 +42,17 @@ public class SetHoodAngle extends CommandBase {
     turret.setHood(0);
   }
 
-  public static double rangeHoodAngleWithLL(double yDistanceSupplier) {
-    // return (0.00001 * Math.pow(yDistanceSupplier, 5))
-    //     - (0.0011 * Math.pow(yDistanceSupplier, 4))
-    //     + (0.0318 * Math.pow(yDistanceSupplier, 3))
-    //     - (0.3025 * Math.pow(yDistanceSupplier, 2))
-    //     + (0.9527 * yDistanceSupplier)
-    //     - (0.0202);
+  public static double rangeHoodAngleWithLL(double yDistance) {
     return -0.0072
-        + 0.69 * yDistanceSupplier
-        - 0.238 * Math.pow(yDistanceSupplier, 2)
-        + 0.0262 * Math.pow(yDistanceSupplier, 3)
-        - 0.000917 * Math.pow(yDistanceSupplier, 4)
-        + 0.00000983 * Math.pow(yDistanceSupplier, 5)
-        + 0.0000000175 * Math.pow(yDistanceSupplier, 6);
+        + 0.69 * yDistance
+        - 0.238 * Math.pow(yDistance, 2)
+        + 0.0262 * Math.pow(yDistance, 3)
+        - 0.000917 * Math.pow(yDistance, 4)
+        + 0.00000983 * Math.pow(yDistance, 5)
+        + 0.0000000175 * Math.pow(yDistance, 6);
+  }
+
+  public static double rangeHoodAngleWithLLMiniTabUncodedUnits(double yDistance) {
+    return -2.249 + 0.485 * yDistance + 0.01307 * Math.pow(yDistance, 2);
   }
 }

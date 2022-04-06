@@ -4,7 +4,6 @@
 
 package frc.robot.commands.DrivetrainCommands;
 
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 
@@ -18,8 +17,6 @@ public class DriveAndWait extends ParallelDeadlineGroup {
     // addCommands().
     super(new WaitCommand(seconds));
     // addCommands(new FooCommand(), new BarCommand());
-    addCommands(
-      new DriveDistance(distance, speed)
-    );
+    addCommands(new DriveDistance(distance, speed));
   }
 }

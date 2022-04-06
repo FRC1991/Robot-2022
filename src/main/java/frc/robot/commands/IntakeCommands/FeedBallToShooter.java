@@ -32,6 +32,10 @@ public class FeedBallToShooter extends CommandBase {
   public void end(boolean interrupted) {
     intake.setIntakeMotor1(0);
     intake.setIntakeMotor2(0);
-    NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Main").getEntry("Ball In").setBoolean(false);
+    NetworkTableInstance.getDefault()
+        .getTable("Shuffleboard")
+        .getSubTable("Main")
+        .getEntry("Ball In")
+        .setBoolean(false);
   }
 }

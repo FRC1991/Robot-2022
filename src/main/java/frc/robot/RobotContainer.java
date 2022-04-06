@@ -22,7 +22,6 @@ import frc.robot.commands.AutoCommands.ComplexAuto;
 import frc.robot.commands.AutoCommands.TwoBallAuto;
 import frc.robot.commands.DrivetrainCommands.BallChase;
 import frc.robot.commands.DrivetrainCommands.GTADrive;
-import frc.robot.commands.DrivetrainCommands.TurnGyro;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
 import frc.robot.commands.IntakeCommands.RunIntakeForBall;
 import frc.robot.commands.IntakeCommands.RunIntakeOutForBall;
@@ -258,7 +257,7 @@ public class RobotContainer {
     mTurret.setDefaultCommand(
         new RunCommand(
             () -> {
-              mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.2);
+              mTurret.setTurret(oInterface.getAuxRightXAxis() * 0.4);
               // mTurret.setHood(oInterface.getAuxRightYAxis() * 0.2);
             },
             mTurret));
@@ -297,12 +296,12 @@ public class RobotContainer {
     // Limelight Shooter Ranging
     mShooter.setDefaultCommand(
         new SetShooterPID(
-            () -> (SetShooterPID.rangeRPM1WithLL(() -> (yDistance)*1.15)),
-            () -> (SetShooterPID.rangeRPM2WithLL(() -> (yDistance)))));
+            () -> (SetShooterPID.rangeRPM1WithLL(() -> (Math.abs(yDistance)))),
+            () -> (SetShooterPID.rangeRPM2WithLL(() -> (Math.abs(yDistance))))));
 
     // DOE Bindings
     // mShooter.setDefaultCommand(dashboardBasedShooterRPMCommand);
-    oInterface.getAuxXButton().whenPressed(new SetHoodAngle(() -> (hoodAngle)));
+    // oInterface.getAuxXButton().whenPressed(new SetHoodAngle(() -> (hoodAngle)));
   }
 
   /**
