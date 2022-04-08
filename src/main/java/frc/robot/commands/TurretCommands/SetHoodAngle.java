@@ -14,7 +14,7 @@ public class SetHoodAngle extends CommandBase {
   public SetHoodAngle(Supplier<Double> hoodAngleSupplier) {
     turret = RobotContainer.mTurret;
     hoodAngle = hoodAngleSupplier;
-    addRequirements(turret);
+    // addRequirements(turret);
   }
 
   @Override
