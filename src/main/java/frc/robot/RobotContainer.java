@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.OperatingInterface.OperatingInterface;
 import frc.robot.commands.AutoCommands.ComplexAuto;
 import frc.robot.commands.AutoCommands.TwoBallAuto;
+import frc.robot.commands.ClimberCommands.RunClimber;
 import frc.robot.commands.DrivetrainCommands.BallChase;
 import frc.robot.commands.DrivetrainCommands.GTADrive;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
@@ -50,8 +51,7 @@ public class RobotContainer {
   public static Intake mIntake = new Intake();
   public static Shooter mShooter = new Shooter();
   public static Turret mTurret = new Turret();
-  // public static Climber mClimber = new Climber();
-  public static Climber mClimber = null;
+  public static Climber mClimber = new Climber();
   public static double ballXError,
       targetXSteer,
       yDistance,
@@ -78,7 +78,7 @@ public class RobotContainer {
           oInterface::getDriveRightTriggerAxis,
           oInterface::getDriveLeftTriggerAxis,
           oInterface::getDriveLeftXAxis,
-          oInterface.getDriveRightBumper()::get,
+          ()->(false),
           () -> (maxSpeed));
   BallChase standardBallChaseCommand = new BallChase(() -> (ballXError));
   BallChase triggerAccelBalChaseCommand =
@@ -260,21 +260,11 @@ public class RobotContainer {
     // Driver Climbing Bindings
     oInterface
         .getDriveLeftBumper()
-        .whileHeld(
-            new RunCommand(
-                () -> {
-                  mClimber.setClimberMotor(1.0);
-                },
-                mClimber));
+        .whileHeld(new RunClimber(()->(-1.0)));
 
     oInterface
         .getDriveRightBumper()
-        .whileHeld(
-            new RunCommand(
-                () -> {
-                  mClimber.setClimberMotor(-1.0);
-                },
-                mClimber));
+        .whileHeld(new RunClimber(()->(1.0)));
 
     // Driver Shooter Ranging Bindings
     oInterface

@@ -26,11 +26,11 @@ public class RunClimber extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    NetworkTableInstance.getDefault()
-        .getTable("Shuffleboard")
-        .getSubTable("Main")
-        .getEntry("Max Speed")
-        .setNumber(0.37);
+    // NetworkTableInstance.getDefault()
+    //     .getTable("Shuffleboard")
+    //     .getSubTable("Main")
+    //     .getEntry("Max Speed")
+    //     .setNumber(0.37);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
