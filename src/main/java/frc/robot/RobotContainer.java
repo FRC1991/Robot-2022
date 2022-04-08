@@ -78,7 +78,7 @@ public class RobotContainer {
           oInterface::getDriveRightTriggerAxis,
           oInterface::getDriveLeftTriggerAxis,
           oInterface::getDriveLeftXAxis,
-          ()->(false),
+          () -> (false),
           () -> (maxSpeed));
   BallChase standardBallChaseCommand = new BallChase(() -> (ballXError));
   BallChase triggerAccelBalChaseCommand =
@@ -258,13 +258,21 @@ public class RobotContainer {
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
 
     // Driver Climbing Bindings
-    oInterface
-        .getDriveLeftBumper()
-        .whileHeld(new RunClimber(()->(-1.0)));
+    oInterface.getDriveLeftBumper().whileHeld(new RunClimber(() -> (-1.0)));
+
+    oInterface.getDriveRightBumper().whileHeld(new RunClimber(() -> (1.0)));
 
     oInterface
-        .getDriveRightBumper()
-        .whileHeld(new RunClimber(()->(1.0)));
+        .getDriveRightStickDownButton()
+        .whenPressed(
+            new InstantCommand(
+                () -> {
+                  NetworkTableInstance.getDefault()
+                      .getTable("Shuffleboard")
+                      .getSubTable("Main")
+                      .getEntry("Max Speed")
+                      .setNumber(1.0);
+                }));
 
     // Driver Shooter Ranging Bindings
     oInterface

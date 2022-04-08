@@ -21,7 +21,7 @@ public class TwoBallAuto extends SequentialCommandGroup {
         new FeedBallToShooter().withTimeout(0.3),
         new DriveDistanceUntilCapture(10, -0.9),
         new WaitCommand(0.2),
-        new AimTurret(targetXErrorSupplier).withTimeout(1.5),
+        new AimTurret(targetXErrorSupplier).withTimeout(1),
         new SetHoodAngle(
             () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
         new FeedBallToShooter().withTimeout(0.3));

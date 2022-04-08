@@ -6,7 +6,6 @@ package frc.robot.commands.AutoCommands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DrivetrainCommands.BallChase;
-import frc.robot.commands.DrivetrainCommands.DriveDistance;
 import frc.robot.commands.DrivetrainCommands.TurnGyro;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
 import frc.robot.commands.TurretCommands.AimTurret;
@@ -29,13 +28,12 @@ public class ComplexAuto extends SequentialCommandGroup {
         new TurnGyro(100, -0.5),
         new BallChase(xSteerSupplier),
         new TurnGyro(25, 0.5),
-        new AimTurret(targetXErrorSupplier).withTimeout(1.5),
+        new AimTurret(targetXErrorSupplier).withTimeout(1),
         new SetHoodAngle(
             () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
         new FeedBallToShooter().withTimeout(0.3),
         new BallChase(xSteerSupplier, () -> (1.)),
-        new DriveDistance(30, 0.9),
-        new AimTurret(targetXErrorSupplier).withTimeout(1.5),
+        new AimTurret(targetXErrorSupplier).withTimeout(1),
         new SetHoodAngle(
             () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
         new FeedBallToShooter().withTimeout(0.3));
