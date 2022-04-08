@@ -26,7 +26,7 @@ public class ComplexAuto extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
         new TwoBallAuto(xSteerSupplier, yDistanceSupplier, targetXErrorSupplier),
-        new TurnGyro(110, -0.5),
+        new TurnGyro(100, -0.5),
         new BallChase(xSteerSupplier),
         new TurnGyro(25, 0.5),
         new AimTurret(targetXErrorSupplier).withTimeout(1.5),

@@ -64,7 +64,7 @@ public class BallChase extends CommandBase {
     drivetrain.arcadeDrive(-speed.get(), -steeringAdjust);
     // System.out.println("Ball Chase Output to Drive " + steeringAdjust);
 
-    intake.setIntakeMotor1(-0.8);
+    // intake.setIntakeMotor1(-0.8);
     intake.setIntakeMotor2(0.8);
   }
 
@@ -77,7 +77,7 @@ public class BallChase extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     // let driver know they have control again and update network tables
-    intake.setIntakeMotor1(0);
+    // intake.setIntakeMotor1(0);
     intake.setIntakeMotor2(0);
     // oInterface.doubleVibrateDrive();
     oInterface.driveJoystick.setRumble(RumbleType.kRightRumble, 0);
