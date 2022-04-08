@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -257,13 +258,23 @@ public class RobotContainer {
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
 
     // Driver Climbing Bindings
-    oInterface.getDriveLeftBumper().whileHeld(new RunCommand(()->{
-        mClimber.setClimberMotor(1.0);
-    }, mClimber));
+    oInterface
+        .getDriveLeftBumper()
+        .whileHeld(
+            new RunCommand(
+                () -> {
+                  mClimber.setClimberMotor(1.0);
+                },
+                mClimber));
 
-    oInterface.getDriveRightBumper().whileHeld(new RunCommand(()->{
-        mClimber.setClimberMotor(-1.0);
-    }, mClimber));
+    oInterface
+        .getDriveRightBumper()
+        .whileHeld(
+            new RunCommand(
+                () -> {
+                  mClimber.setClimberMotor(-1.0);
+                },
+                mClimber));
 
     // Driver Shooter Ranging Bindings
     oInterface
@@ -368,7 +379,13 @@ public class RobotContainer {
                 new PrintCommand(Double.toString(yDistance)),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
                 new FeedBallToShooter().withTimeout(0.3)));
-    oInterface.getAuxLeftTriggerButton().whileActiveOnce(new AimTurret(() -> (targetXSteer)));
+
+    oInterface
+        .getAuxLeftTriggerButton()
+        .whileActiveOnce(
+            new ParallelCommandGroup(
+                new AimTurret(() -> (targetXSteer)),
+                new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
 
     // Limelight Shooter Ranging
     mShooter.setDefaultCommand(
