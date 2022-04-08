@@ -7,13 +7,18 @@ import frc.robot.Constants;
 
 public class Climber extends SubsystemBase {
 
-  private CANSparkMax climberMotor;
+  private CANSparkMax climberMotor, transverseMotor;
 
   public Climber() {
     climberMotor = new CANSparkMax(Constants.elevatorRaiseMotor, MotorType.kBrushless);
+    transverseMotor = new CANSparkMax(Constants.climberTransverseMotor, MotorType.kBrushless);
   }
 
   public void setClimberMotor(double speed) {
     climberMotor.set(speed);
+  }
+
+  public void setTransverseMotor(double speed){
+    transverseMotor.set(speed);
   }
 }

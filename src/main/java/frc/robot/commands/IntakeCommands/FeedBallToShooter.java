@@ -30,7 +30,6 @@ public class FeedBallToShooter extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    intake.setIntakeMotor1(0);
     intake.setIntakeMotor2(0);
     NetworkTableInstance.getDefault()
         .getTable("Shuffleboard")

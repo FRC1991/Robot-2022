@@ -15,7 +15,7 @@ public class TwoBallAuto extends SequentialCommandGroup {
       Supplier<Double> yDistanceSupplier,
       Supplier<Double> targetXErrorSupplier) {
     addCommands(
-        new DriveAndWait(3, 4, -0.35),
+        new DriveAndWait(2.6, 5.5, -0.35),
         new SetHoodAngle(
             () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
         new FeedBallToShooter().withTimeout(0.3),

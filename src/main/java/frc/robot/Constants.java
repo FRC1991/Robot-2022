@@ -23,12 +23,12 @@ public final class Constants {
   public static final int rightMotor3 = 3;
   public static final int turretMotor = 7;
   public static final int hoodMotor = 12;
-  public static final int intakeMotor1 = 13;
   public static final int intakeMotor2 = 14;
   public static final int mainFlywheelMotor1 = 9;
   public static final int mainFlywheelMotor2 = 10;
   public static final int secondaryFlywheel = 11;
   public static final int elevatorRaiseMotor = 8;
+  public static final int climberTransverseMotor = 13;
   public static final int pigeonIMU = 0;
   public static final double GTADriveMultiplier = 1;
   public static final double tankDriveMultiplier = 2;

@@ -1,7 +1,6 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
-// does not work, not sure why, will not fix
 
 package frc.robot;
 
@@ -14,6 +13,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -49,7 +49,8 @@ public class RobotContainer {
   public static Intake mIntake = new Intake();
   public static Shooter mShooter = new Shooter();
   public static Turret mTurret = new Turret();
-  public static Climber mClimber = new Climber();
+  // public static Climber mClimber = new Climber();
+  public static Climber mClimber = null;
   public static double ballXError,
       targetXSteer,
       yDistance,
@@ -77,13 +78,14 @@ public class RobotContainer {
           oInterface::getDriveLeftTriggerAxis,
           oInterface::getDriveLeftXAxis,
           oInterface.getDriveRightBumper()::get,
-          () -> (maxSpeed),
-          oInterface.getDriveXButton()::get);
+          () -> (maxSpeed));
   BallChase standardBallChaseCommand = new BallChase(() -> (ballXError));
   BallChase triggerAccelBalChaseCommand =
       new BallChase(() -> (ballXError), oInterface::getDriveLeftTriggerAxis);
   SetShooterPID dashboardBasedShooterRPMCommand =
       new SetShooterPID(() -> (shooterRPMFlywheel1), () -> (shooterRPMFlywheel2));
+
+  int yDistanceListener;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands. Try to keep this as
@@ -201,12 +203,13 @@ public class RobotContainer {
         },
         Constants.defaultFlags);
 
-    shooterNt.addEntryListener(
-        "ty",
-        (table, key, entry, value, flags) -> {
-          yDistance = value.getDouble();
-        },
-        Constants.defaultFlags);
+    yDistanceListener =
+        shooterNt.addEntryListener(
+            "ty",
+            (table, key, entry, value, flags) -> {
+              yDistance = value.getDouble();
+            },
+            Constants.defaultFlags);
 
     // update max speed from dashboard
     maxSpeedEntry.addListener(
@@ -253,6 +256,91 @@ public class RobotContainer {
     oInterface.getDriveAButton().whenPressed(triggerAccelBalChaseCommand);
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
 
+    // Driver Climbing Bindings
+    oInterface.getDriveLeftBumper().whileHeld(new RunCommand(()->{
+        mClimber.setClimberMotor(1.0);
+    }, mClimber));
+
+    oInterface.getDriveRightBumper().whileHeld(new RunCommand(()->{
+        mClimber.setClimberMotor(-1.0);
+    }, mClimber));
+
+    // Driver Shooter Ranging Bindings
+    oInterface
+        .getDriveYButton()
+        .whenPressed(
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      NetworkTableInstance.getDefault()
+                          .getTable("limelight-shooter")
+                          .getEntry("ty")
+                          .addListener(
+                              (notification) -> {
+                                yDistance = notification.getEntry().getValue().getDouble();
+                              },
+                              Constants.defaultFlags);
+                    }),
+                new SetShooterPID(
+                    () -> (SetShooterPID.rangeRPM1WithLL(() -> (Math.abs(yDistance)))),
+                    () -> (SetShooterPID.rangeRPM2WithLL(() -> (Math.abs(yDistance)))))));
+
+    oInterface
+        .getDriveDPadUp()
+        .whenPressed(
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      yDistance = 13.4;
+                      NetworkTableInstance.getDefault()
+                          .getTable("limelight-shooter")
+                          .getEntry("ty")
+                          .removeListener(yDistanceListener);
+                    }),
+                new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
+
+    oInterface
+        .getDriveDPadDown()
+        .whenPressed(
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      yDistance = 0.;
+                      NetworkTableInstance.getDefault()
+                          .getTable("limelight-shooter")
+                          .getEntry("ty")
+                          .removeListener(yDistanceListener);
+                    }),
+                new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
+
+    oInterface
+        .getDriveDPadLeft()
+        .whenPressed(
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      yDistance = 21.5;
+                      NetworkTableInstance.getDefault()
+                          .getTable("limelight-shooter")
+                          .getEntry("ty")
+                          .removeListener(yDistanceListener);
+                    }),
+                new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
+
+    oInterface
+        .getDriveDPadRight()
+        .whenPressed(
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      yDistance = 30.;
+                      NetworkTableInstance.getDefault()
+                          .getTable("limelight-shooter")
+                          .getEntry("ty")
+                          .removeListener(yDistanceListener);
+                    }),
+                new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
+
     // Aux Manual Turret Control Bindings
     mTurret.setDefaultCommand(
         new RunCommand(
@@ -275,23 +363,12 @@ public class RobotContainer {
         .getAuxRightTriggerButton()
         .whenPressed(
             new SequentialCommandGroup(
-                new PrintCommand(
-                    Double.toString(SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
+                // new PrintCommand(
+                //     Double.toString(SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
+                new PrintCommand(Double.toString(yDistance)),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
                 new FeedBallToShooter().withTimeout(0.3)));
     oInterface.getAuxLeftTriggerButton().whileActiveOnce(new AimTurret(() -> (targetXSteer)));
-    oInterface
-        .getAuxDPadUp()
-        .whenPressed(
-            () -> {
-              manualRPMAdjust += 10;
-            });
-    oInterface
-        .getAuxDPadDown()
-        .whenPressed(
-            () -> {
-              manualRPMAdjust -= 10;
-            });
 
     // Limelight Shooter Ranging
     mShooter.setDefaultCommand(

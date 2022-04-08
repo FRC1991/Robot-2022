@@ -8,7 +8,7 @@ import frc.robot.Constants;
 
 public class Turret extends SubsystemBase {
 
-  private final CANSparkMax turretMotor, hoodMotor;
+  public final CANSparkMax turretMotor, hoodMotor;
 
   public Turret() {
     turretMotor = new CANSparkMax(Constants.turretMotor, MotorType.kBrushless);

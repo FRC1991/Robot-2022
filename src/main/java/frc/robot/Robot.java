@@ -60,7 +60,15 @@ public class Robot extends TimedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    RobotContainer.mTurret.hoodMotor.setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getLeftMotor1().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getLeftMotor2().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getLeftMotor3().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getRightMotor1().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getRightMotor2().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mDrivetrain.getRightMotor3().setIdleMode(IdleMode.kCoast);
+  }
 
   @Override
   public void disabledPeriodic() {}
@@ -81,6 +89,7 @@ public class Robot extends TimedRobot {
     RobotContainer.mDrivetrain.getRightMotor1().setIdleMode(IdleMode.kBrake);
     RobotContainer.mDrivetrain.getRightMotor2().setIdleMode(IdleMode.kBrake);
     RobotContainer.mDrivetrain.getRightMotor3().setIdleMode(IdleMode.kBrake);
+    RobotContainer.mTurret.hoodMotor.setIdleMode(IdleMode.kBrake);
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -108,6 +117,7 @@ public class Robot extends TimedRobot {
     RobotContainer.mDrivetrain.getRightMotor1().setIdleMode(IdleMode.kCoast);
     RobotContainer.mDrivetrain.getRightMotor2().setIdleMode(IdleMode.kCoast);
     RobotContainer.mDrivetrain.getRightMotor3().setIdleMode(IdleMode.kCoast);
+    RobotContainer.mTurret.hoodMotor.setIdleMode(IdleMode.kBrake);
     isRedAlliance = DriverStation.getAlliance().compareTo(DriverStation.Alliance.Red) == 0;
     ballNt = NetworkTableInstance.getDefault().getTable("limelight-balls");
     if (Robot.isRedAlliance) {

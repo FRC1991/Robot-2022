@@ -26,14 +26,14 @@ public class RunIntakeOutForBall extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.setIntakeMotor1(0.8);
+    // intake.setIntakeMotor1(0.8);
     intake.setIntakeMotor2(-0.8);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.setIntakeMotor1(0);
+    // intake.setIntakeMotor1(0);
     intake.setIntakeMotor2(0);
   }
 
