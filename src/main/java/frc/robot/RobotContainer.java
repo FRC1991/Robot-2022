@@ -58,8 +58,8 @@ public class RobotContainer {
       maxSpeed,
       shooterRPMFlywheel1,
       shooterRPMFlywheel2,
-      hoodAngle,
-      manualRPMAdjust = 0;
+      hoodAngle = 0;
+  public static double manualRPMAdjust = 1.0;
   public static boolean isBallFound, isChasingBall, isTargetFound = false;
   NetworkTableEntry isBallFoundEntry,
       maxSpeedEntry,
@@ -291,8 +291,12 @@ public class RobotContainer {
                               Constants.defaultFlags);
                     }),
                 new SetShooterPID(
-                    () -> (SetShooterPID.rangeRPM1WithLL(() -> (Math.abs(yDistance)))),
-                    () -> (SetShooterPID.rangeRPM2WithLL(() -> (Math.abs(yDistance)))))));
+                    () ->
+                        (SetShooterPID.rangeRPM1WithLL(
+                            () -> (Math.abs(yDistance) * manualRPMAdjust))),
+                    () ->
+                        (SetShooterPID.rangeRPM2WithLL(
+                            () -> (Math.abs(yDistance) * manualRPMAdjust))))));
 
     oInterface
         .getDriveDPadUp()
@@ -378,6 +382,7 @@ public class RobotContainer {
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
                 new FeedBallToShooter().withTimeout(0.3)));
 
+    // Aux Aiming Binding
     oInterface
         .getAuxLeftTriggerButton()
         .whileActiveOnce(
@@ -385,11 +390,44 @@ public class RobotContainer {
                 new AimTurret(() -> (targetXSteer)),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
 
+    // Aux Manual RPM Adjust Binding
+    oInterface
+        .getAuxDPadUp()
+        .whenPressed(
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      manualRPMAdjust = manualRPMAdjust + 0.05;
+                    }),
+                new SetShooterPID(
+                    () ->
+                        (SetShooterPID.rangeRPM1WithLL(
+                            () -> (Math.abs(yDistance) * manualRPMAdjust))),
+                    () ->
+                        (SetShooterPID.rangeRPM2WithLL(
+                            () -> (Math.abs(yDistance) * manualRPMAdjust))))));
+
+    oInterface
+        .getAuxDPadDown()
+        .whenPressed(
+            new SequentialCommandGroup(
+                new InstantCommand(
+                    () -> {
+                      manualRPMAdjust = manualRPMAdjust - 0.05;
+                    }),
+                new SetShooterPID(
+                    () ->
+                        (SetShooterPID.rangeRPM1WithLL(
+                            () -> (Math.abs(yDistance) * manualRPMAdjust))),
+                    () ->
+                        (SetShooterPID.rangeRPM2WithLL(
+                            () -> (Math.abs(yDistance) * manualRPMAdjust))))));
+
     // Limelight Shooter Ranging
     mShooter.setDefaultCommand(
         new SetShooterPID(
-            () -> (SetShooterPID.rangeRPM1WithLL(() -> (Math.abs(yDistance)))),
-            () -> (SetShooterPID.rangeRPM2WithLL(() -> (Math.abs(yDistance))))));
+            () -> (SetShooterPID.rangeRPM1WithLL(() -> (Math.abs(yDistance) * manualRPMAdjust))),
+            () -> (SetShooterPID.rangeRPM2WithLL(() -> (Math.abs(yDistance) * manualRPMAdjust)))));
 
     // DOE Bindings
     // mShooter.setDefaultCommand(dashboardBasedShooterRPMCommand);
