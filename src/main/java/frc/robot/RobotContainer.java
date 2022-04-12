@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.OperatingInterface.OperatingInterface;
@@ -78,7 +77,7 @@ public class RobotContainer {
           oInterface::getDriveRightTriggerAxis,
           oInterface::getDriveLeftTriggerAxis,
           oInterface::getDriveLeftXAxis,
-          () -> (false),
+          oInterface.getDriveRightBumper()::get,
           () -> (maxSpeed));
   BallChase standardBallChaseCommand = new BallChase(() -> (ballXError));
   BallChase triggerAccelBalChaseCommand =
@@ -159,6 +158,7 @@ public class RobotContainer {
     autonomousChooser.addOption(
         "Complex Auto",
         new ComplexAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer)));
+    Shuffleboard.getTab("Main").add(autonomousChooser);
   }
 
   /*
@@ -274,6 +274,18 @@ public class RobotContainer {
                       .setNumber(1.0);
                 }));
 
+    oInterface
+        .getDriveXButton()
+        .whenPressed(
+            new InstantCommand(
+                () -> {
+                  NetworkTableInstance.getDefault()
+                      .getTable("Shuffleboard")
+                      .getSubTable("Main")
+                      .getEntry("Max Speed")
+                      .setNumber(0.36);
+                }));
+
     // Driver Shooter Ranging Bindings
     oInterface
         .getDriveYButton()
@@ -378,7 +390,6 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 // new PrintCommand(
                 //     Double.toString(SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
-                new PrintCommand(Double.toString(yDistance)),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
                 new FeedBallToShooter().withTimeout(0.3)));
 
@@ -390,38 +401,38 @@ public class RobotContainer {
                 new AimTurret(() -> (targetXSteer)),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
 
-    // Aux Manual RPM Adjust Binding
-    oInterface
-        .getAuxDPadUp()
-        .whenPressed(
-            new SequentialCommandGroup(
-                new InstantCommand(
-                    () -> {
-                      manualRPMAdjust = manualRPMAdjust + 0.05;
-                    }),
-                new SetShooterPID(
-                    () ->
-                        (SetShooterPID.rangeRPM1WithLL(
-                            () -> (Math.abs(yDistance) * manualRPMAdjust))),
-                    () ->
-                        (SetShooterPID.rangeRPM2WithLL(
-                            () -> (Math.abs(yDistance) * manualRPMAdjust))))));
+    // // Aux Manual RPM Adjust Binding
+    // oInterface
+    //     .getAuxDPadUp()
+    //     .whenPressed(
+    //         new SequentialCommandGroup(
+    //             new InstantCommand(
+    //                 () -> {
+    //                   manualRPMAdjust = manualRPMAdjust + 0.05;
+    //                 }),
+    //             new SetShooterPID(
+    //                 () ->
+    //                     (SetShooterPID.rangeRPM1WithLL(
+    //                         () -> (Math.abs(yDistance) * manualRPMAdjust))),
+    //                 () ->
+    //                     (SetShooterPID.rangeRPM2WithLL(
+    //                         () -> (Math.abs(yDistance) * manualRPMAdjust))))));
 
-    oInterface
-        .getAuxDPadDown()
-        .whenPressed(
-            new SequentialCommandGroup(
-                new InstantCommand(
-                    () -> {
-                      manualRPMAdjust = manualRPMAdjust - 0.05;
-                    }),
-                new SetShooterPID(
-                    () ->
-                        (SetShooterPID.rangeRPM1WithLL(
-                            () -> (Math.abs(yDistance) * manualRPMAdjust))),
-                    () ->
-                        (SetShooterPID.rangeRPM2WithLL(
-                            () -> (Math.abs(yDistance) * manualRPMAdjust))))));
+    // oInterface
+    //     .getAuxDPadDown()
+    //     .whenPressed(
+    //         new SequentialCommandGroup(
+    //             new InstantCommand(
+    //                 () -> {
+    //                   manualRPMAdjust = manualRPMAdjust - 0.05;
+    //                 }),
+    //             new SetShooterPID(
+    //                 () ->
+    //                     (SetShooterPID.rangeRPM1WithLL(
+    //                         () -> (Math.abs(yDistance) * manualRPMAdjust))),
+    //                 () ->
+    //                     (SetShooterPID.rangeRPM2WithLL(
+    //                         () -> (Math.abs(yDistance) * manualRPMAdjust))))));
 
     // Limelight Shooter Ranging
     mShooter.setDefaultCommand(
@@ -441,7 +452,8 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // return new TwoBallAuto(()->(ballXError), ()->(yDistance), ()->(targetXSteer));
-    return new ComplexAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer));
+    // return new ComplexAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer));
     // return new TurnGyro(80, 0.5);
+    return autonomousChooser.getSelected();
   }
 }

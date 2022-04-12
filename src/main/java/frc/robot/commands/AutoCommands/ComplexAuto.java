@@ -27,15 +27,15 @@ public class ComplexAuto extends SequentialCommandGroup {
         new TwoBallAuto(xSteerSupplier, yDistanceSupplier, targetXErrorSupplier),
         new TurnGyro(100, -0.5),
         new BallChase(xSteerSupplier),
-        new TurnGyro(25, 0.5),
-        new AimTurret(targetXErrorSupplier).withTimeout(1),
-        new SetHoodAngle(
-            () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
-        new FeedBallToShooter().withTimeout(0.3),
-        new BallChase(xSteerSupplier, () -> (1.)),
-        new AimTurret(targetXErrorSupplier).withTimeout(1),
+        new TurnGyro(50, 0.5),
+        new AimTurret(targetXErrorSupplier).withTimeout(2),
         new SetHoodAngle(
             () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
         new FeedBallToShooter().withTimeout(0.3));
+        // new BallChase(xSteerSupplier, () -> (1.)),
+        // new AimTurret(targetXErrorSupplier).withTimeout(1),
+        // new SetHoodAngle(
+            // () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
+        // new FeedBallToShooter().withTimeout(0.3));
   }
 }
