@@ -59,7 +59,7 @@ public class RobotContainer {
       shooterRPMFlywheel2,
       hoodAngle = 0;
   public static double manualRPMAdjust = 1.0;
-  public static boolean isBallFound, isChasingBall, isTargetFound = false;
+  public static boolean isBallFound, isChasingBall, isTargetFound, isDefenseMode = false;
   NetworkTableEntry isBallFoundEntry,
       maxSpeedEntry,
       isChasingBallEntry,
@@ -67,7 +67,8 @@ public class RobotContainer {
       shooterRPMFlywheel2Entry,
       hoodAngleEntry,
       isTargetFoundEntry,
-      isBallInEntry;
+      isBallInEntry,
+      isDefenseModeEntry;
   public static NetworkTableEntry measuredRPMFlywheel1Entry, measuredRPMFlywheel2Entry;
 
   SendableChooser<Command> autonomousChooser;
@@ -93,7 +94,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     dashboardInit();
-    visionInit();
+    NTListenerInit();
     configureButtonBindings();
   }
 
@@ -147,6 +148,13 @@ public class RobotContainer {
             .add("Flywheel 2", 0)
             .withWidget(BuiltInWidgets.kTextView)
             .getEntry();
+
+    isDefenseModeEntry =
+        Shuffleboard.getTab("Main")
+            .add("Defense Mode", false)
+            .withWidget(BuiltInWidgets.kToggleSwitch)
+            .getEntry();
+
     // HttpCamera limelightBallCamera =
     //     new HttpCamera("limelight-balls-http", "http://10.19.91.69:5800");
     // Shuffleboard.getTab("Main").add(limelightBallCamera);
@@ -164,7 +172,7 @@ public class RobotContainer {
   /*
    * Mostly NT setup for now, could change later
    */
-  private void visionInit() {
+  private void NTListenerInit() {
     // network tables setup
     NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
     NetworkTable ballNt = ntInst.getTable("limelight-balls");
@@ -225,6 +233,7 @@ public class RobotContainer {
           shooterRPMFlywheel1 = notification.getEntry().getValue().getDouble();
         },
         Constants.defaultFlags);
+
     shooterRPMFlywheel2Entry.addListener(
         (notification) -> {
           shooterRPMFlywheel2 = notification.getEntry().getValue().getDouble();
@@ -234,6 +243,22 @@ public class RobotContainer {
     hoodAngleEntry.addListener(
         (notification) -> {
           hoodAngle = notification.getEntry().getValue().getDouble();
+        },
+        Constants.defaultFlags);
+
+    isDefenseModeEntry.addListener(
+        (notification) -> {
+          isDefenseMode = notification.getEntry().getValue().getBoolean();
+          if(isDefenseMode){
+          NetworkTableEntry currentPipeline =
+              NetworkTableInstance.getDefault().getTable("limelight-balls").getEntry("pipeline");
+          if (currentPipeline.getDouble(2) == 0) {
+            currentPipeline.setNumber(1);
+          } else if (currentPipeline.getDouble(2) == 1) {
+            currentPipeline.setNumber(0);
+          }
+          staticRPMAndHoodAngle(36.0);
+          }
         },
         Constants.defaultFlags);
   }
@@ -259,7 +284,6 @@ public class RobotContainer {
 
     // Driver Climbing Bindings
     oInterface.getDriveLeftBumper().whileHeld(new RunClimber(() -> (-1.0)));
-
     oInterface.getDriveRightBumper().whileHeld(new RunClimber(() -> (1.0)));
 
     oInterface
@@ -316,11 +340,7 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 new InstantCommand(
                     () -> {
-                      yDistance = 13.4;
-                      NetworkTableInstance.getDefault()
-                          .getTable("limelight-shooter")
-                          .getEntry("ty")
-                          .removeListener(yDistanceListener);
+                      staticRPMAndHoodAngle(13.4);
                     }),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
 
@@ -330,11 +350,7 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 new InstantCommand(
                     () -> {
-                      yDistance = 0.;
-                      NetworkTableInstance.getDefault()
-                          .getTable("limelight-shooter")
-                          .getEntry("ty")
-                          .removeListener(yDistanceListener);
+                      staticRPMAndHoodAngle(0.);
                     }),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
 
@@ -344,11 +360,7 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 new InstantCommand(
                     () -> {
-                      yDistance = 21.5;
-                      NetworkTableInstance.getDefault()
-                          .getTable("limelight-shooter")
-                          .getEntry("ty")
-                          .removeListener(yDistanceListener);
+                      staticRPMAndHoodAngle(21.5);
                     }),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
 
@@ -358,11 +370,7 @@ public class RobotContainer {
             new SequentialCommandGroup(
                 new InstantCommand(
                     () -> {
-                      yDistance = 30.;
-                      NetworkTableInstance.getDefault()
-                          .getTable("limelight-shooter")
-                          .getEntry("ty")
-                          .removeListener(yDistanceListener);
+                      staticRPMAndHoodAngle(30.);
                     }),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
 
@@ -440,10 +448,31 @@ public class RobotContainer {
             () -> (SetShooterPID.rangeRPM1WithLL(() -> (Math.abs(yDistance) * manualRPMAdjust))),
             () -> (SetShooterPID.rangeRPM2WithLL(() -> (Math.abs(yDistance) * manualRPMAdjust)))));
 
+    // Aux Defense Mode Binding
+    oInterface
+        .getAuxStartButton()
+        .whenPressed(
+            new InstantCommand(
+                () -> {
+                  NetworkTableInstance.getDefault()
+                      .getTable("Shuffleboard")
+                      .getSubTable("Main")
+                      .getEntry("Defense Mode")
+                      .setBoolean(true);
+                }));
+
     // DOE Bindings
     // mShooter.setDefaultCommand(dashboardBasedShooterRPMCommand);
     // oInterface.getAuxXButton().whenPressed(new SetHoodAngle(() -> (hoodAngle)));
   }
+
+private void staticRPMAndHoodAngle(double staticDistance) {
+    yDistance = staticDistance;
+      NetworkTableInstance.getDefault()
+          .getTable("limelight-shooter")
+          .getEntry("ty")
+          .removeListener(yDistanceListener);
+}
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -8,8 +8,7 @@ import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
   private final CANSparkMax mainFlyWheelMotor1, mainFlywheelMotor2, secondaryFlywheelMotor;
-  private SparkMaxPIDController pidControllerMainFlywheel1,
-      pidControllerSecondaryFlywheel;
+  private SparkMaxPIDController pidControllerMainFlywheel1, pidControllerSecondaryFlywheel;
   private final double kPMainFlywheel = Constants.kPFlywheel1;
   private final double kIMainFlywheel = Constants.kIFlywheel1;
   private final double kDMainFlywheel = Constants.kdFlywheel1;

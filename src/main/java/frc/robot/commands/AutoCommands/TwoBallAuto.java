@@ -1,7 +1,6 @@
 package frc.robot.commands.AutoCommands;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.DrivetrainCommands.DriveAndWait;
 import frc.robot.commands.DrivetrainCommands.DriveDistanceUntilCapture;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
