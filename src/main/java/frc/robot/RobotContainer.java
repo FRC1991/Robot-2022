@@ -45,12 +45,16 @@ import java.util.Map;
 public class RobotContainer {
   // The robot's subsystems, commands, and global variables are defined here
 
+  //#region ==================Subsystems=====================
   public static Drivetrain mDrivetrain = new Drivetrain();
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
   public static Shooter mShooter = new Shooter();
   public static Turret mTurret = new Turret();
   public static Climber mClimber = new Climber();
+  //#endregion
+  
+  //#region ==================Global Vars=====================
   public static double ballXError,
       targetXSteer,
       yDistance,
@@ -59,9 +63,8 @@ public class RobotContainer {
       shooterRPMFlywheel2,
       hoodAngle = 0;
   public static double manualRPMAdjust = 1.0;
-  public static boolean isBallFound, isChasingBall, isTargetFound, isDefenseMode = false;
-  NetworkTableEntry isBallFoundEntry,
-      maxSpeedEntry,
+  public static boolean isChasingBall, isTargetFound, isDefenseMode = false;
+  NetworkTableEntry maxSpeedEntry,
       isChasingBallEntry,
       shooterRPMFlywheel1Entry,
       shooterRPMFlywheel2Entry,
@@ -70,9 +73,10 @@ public class RobotContainer {
       isBallInEntry,
       isDefenseModeEntry;
   public static NetworkTableEntry measuredRPMFlywheel1Entry, measuredRPMFlywheel2Entry;
-
   SendableChooser<Command> autonomousChooser;
+  //#endregion
 
+ //#region ===================MAKE COMMANDS=====================
   GTADrive standardGTADriveCommand =
       new GTADrive(
           oInterface::getDriveRightTriggerAxis,
@@ -87,6 +91,8 @@ public class RobotContainer {
       new SetShooterPID(() -> (shooterRPMFlywheel1), () -> (shooterRPMFlywheel2));
 
   int yDistanceListener;
+
+  //#endregion
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands. Try to keep this as
@@ -107,7 +113,6 @@ public class RobotContainer {
    */
   private void dashboardInit() {
     isChasingBallEntry = Shuffleboard.getTab("Main").add("Chasing Ball", isChasingBall).getEntry();
-    isBallFoundEntry = Shuffleboard.getTab("Main").add("Ball Found", isBallFound).getEntry();
     isBallInEntry = Shuffleboard.getTab("Main").add("Ball In", false).getEntry();
     isTargetFoundEntry =
         Shuffleboard.getTab("Main").add("Shot Target Found", isTargetFound).getEntry();
@@ -193,14 +198,6 @@ public class RobotContainer {
         "tx",
         (table, key, entry, value, flags) -> {
           ballXError = value.getDouble();
-        },
-        Constants.defaultFlags);
-
-    ballNt.addEntryListener(
-        "tv",
-        (table, key, entry, value, flags) -> {
-          isBallFound = value.getDouble() == 1;
-          isBallFoundEntry.setBoolean(isBallFound);
         },
         Constants.defaultFlags);
 
