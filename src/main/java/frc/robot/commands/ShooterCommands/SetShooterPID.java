@@ -1,5 +1,6 @@
 package frc.robot.commands.ShooterCommands;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.Shooter;
@@ -25,8 +26,18 @@ public class SetShooterPID extends CommandBase {
     mShooter.setShooterPID(rpmFlywheel1.get(), rpmFlywheel2.get());
     RobotContainer.measuredRPMFlywheel1Entry.setNumber(mShooter.getMainFlywheel1Velocity());
     RobotContainer.measuredRPMFlywheel2Entry.setNumber(mShooter.getSecondaryFlywheelVelocity());
-    System.out.println(
-        "Flywheel 1 RPM: " + rpmFlywheel1.get() + "\nFLywheel 2 RPM: " + rpmFlywheel2.get());
+    // System.out.println(
+    // "Flywheel 1 RPM: " + rpmFlywheel1.get() + "\nFLywheel 2 RPM: " + rpmFlywheel2.get());
+    NetworkTableInstance.getDefault()
+        .getTable("Shuffleboard")
+        .getSubTable("Main")
+        .getEntry("Shooter Flywheel 1 RPM")
+        .setDouble(rpmFlywheel1.get());
+    NetworkTableInstance.getDefault()
+        .getTable("Shuffleboard")
+        .getSubTable("Main")
+        .getEntry("Shooter Flywheel 2 RPM")
+        .setDouble(rpmFlywheel2.get());
   }
 
   @Override

@@ -12,7 +12,7 @@ public class Shooter extends SubsystemBase {
   private final double kPMainFlywheel = Constants.kPFlywheel1;
   private final double kIMainFlywheel = Constants.kIFlywheel1;
   private final double kDMainFlywheel = Constants.kdFlywheel1;
-  private final double kPSecondaryFlywheel = Constants.kdFlywheel2;
+  private final double kPSecondaryFlywheel = Constants.kPFlywheel2;
   private final double kISecondaryFlywheel = Constants.kIFlywheel2;
   private final double kDSecondaryFlywheel = Constants.kdFlywheel2;
   private final double kMaxOutput = Constants.kMaxOutput;

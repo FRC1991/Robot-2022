@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.OperatingInterface.OperatingInterface;
@@ -45,16 +46,16 @@ import java.util.Map;
 public class RobotContainer {
   // The robot's subsystems, commands, and global variables are defined here
 
-  //#region ==================Subsystems=====================
+  // #region ====================Subsystems======================
   public static Drivetrain mDrivetrain = new Drivetrain();
   public static OperatingInterface oInterface = new OperatingInterface();
   public static Intake mIntake = new Intake();
   public static Shooter mShooter = new Shooter();
   public static Turret mTurret = new Turret();
   public static Climber mClimber = new Climber();
-  //#endregion
-  
-  //#region ==================Global Vars=====================
+  // #endregion
+
+  // #region ===================Global Vars======================
   public static double ballXError,
       targetXSteer,
       yDistance,
@@ -62,7 +63,7 @@ public class RobotContainer {
       shooterRPMFlywheel1,
       shooterRPMFlywheel2,
       hoodAngle = 0;
-  public static double manualRPMAdjust = 1.0;
+  public static double manualRPMAdjust = 0.0;
   public static boolean isChasingBall, isTargetFound, isDefenseMode = false;
   NetworkTableEntry maxSpeedEntry,
       isChasingBallEntry,
@@ -74,9 +75,9 @@ public class RobotContainer {
       isDefenseModeEntry;
   public static NetworkTableEntry measuredRPMFlywheel1Entry, measuredRPMFlywheel2Entry;
   SendableChooser<Command> autonomousChooser;
-  //#endregion
+  // #endregion
 
- //#region ===================MAKE COMMANDS=====================
+  // #region ==================Make Commands=====================
   GTADrive standardGTADriveCommand =
       new GTADrive(
           oInterface::getDriveRightTriggerAxis,
@@ -92,7 +93,7 @@ public class RobotContainer {
 
   int yDistanceListener;
 
-  //#endregion
+  // #endregion
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands. Try to keep this as
@@ -112,6 +113,8 @@ public class RobotContainer {
    * set in Constants.java)super secret secret(lets hope it saves)
    */
   private void dashboardInit() {
+
+    //#region =================Vision Entries===================
     isChasingBallEntry = Shuffleboard.getTab("Main").add("Chasing Ball", isChasingBall).getEntry();
     isBallInEntry = Shuffleboard.getTab("Main").add("Ball In", false).getEntry();
     isTargetFoundEntry =
@@ -123,6 +126,9 @@ public class RobotContainer {
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", 0, "max", 1))
             .getEntry();
+    //#endregion
+
+    //#region =================Diagnostic Entries===================
     shooterRPMFlywheel1Entry =
         Shuffleboard.getTab("Main")
             .add("Shooter Flywheel 1 RPM", 0)
@@ -133,7 +139,7 @@ public class RobotContainer {
         Shuffleboard.getTab("Main")
             .add("Shooter Flywheel 2 RPM", 0)
             .withWidget(BuiltInWidgets.kNumberSlider)
-            .withProperties(Map.of("min", 0, "max", 20000))
+            .withProperties(Map.of("min", 0, "max", 6000))
             .getEntry();
 
     hoodAngleEntry =
@@ -142,6 +148,10 @@ public class RobotContainer {
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", 0, "max", 55))
             .getEntry();
+
+    //#endregion
+    
+    //#region ================Shooter RPM Entries===================
     measuredRPMFlywheel1Entry =
         Shuffleboard.getTab("Main")
             .add("Flywheel 1", 0)
@@ -153,17 +163,22 @@ public class RobotContainer {
             .add("Flywheel 2", 0)
             .withWidget(BuiltInWidgets.kTextView)
             .getEntry();
+    //#endregion
 
+    //#region ==================Autonomous Chooser===================
     isDefenseModeEntry =
         Shuffleboard.getTab("Main")
             .add("Defense Mode", false)
             .withWidget(BuiltInWidgets.kToggleSwitch)
             .getEntry();
+    //#endregion
 
     // HttpCamera limelightBallCamera =
     //     new HttpCamera("limelight-balls-http", "http://10.19.91.69:5800");
     // Shuffleboard.getTab("Main").add(limelightBallCamera);
 
+
+    //#region ========================Shuffleboard=======================
     autonomousChooser = new SendableChooser<Command>();
     autonomousChooser.setDefaultOption(
         "Two Ball Auto",
@@ -172,21 +187,24 @@ public class RobotContainer {
         "Complex Auto",
         new ComplexAuto(() -> (ballXError), () -> (yDistance), () -> (targetXSteer)));
     Shuffleboard.getTab("Main").add(autonomousChooser);
+    //#endregion
   }
 
   /*
    * Mostly NT setup for now, could change later
    */
   private void NTListenerInit() {
-    // network tables setup
+
+    //#region ====================Network Tables Setup===================
     NetworkTableInstance ntInst = NetworkTableInstance.getDefault();
     NetworkTable ballNt = ntInst.getTable("limelight-balls");
     NetworkTable shooterNt = ntInst.getTable("limelight-shooter");
+    //#endregion
 
+    //#region ====================Network Tables Listeners===================
     // add entry listeners to update variables in code from network tables
 
     // check what alliance color we're on and update limelight to track respective balls
-
     if (Robot.isRedAlliance) {
       ballNt.getEntry("pipeline").setNumber(0);
     } else {
@@ -246,18 +264,28 @@ public class RobotContainer {
     isDefenseModeEntry.addListener(
         (notification) -> {
           isDefenseMode = notification.getEntry().getValue().getBoolean();
-          if(isDefenseMode){
-          NetworkTableEntry currentPipeline =
-              NetworkTableInstance.getDefault().getTable("limelight-balls").getEntry("pipeline");
-          if (currentPipeline.getDouble(2) == 0) {
-            currentPipeline.setNumber(1);
-          } else if (currentPipeline.getDouble(2) == 1) {
-            currentPipeline.setNumber(0);
-          }
-          staticRPMAndHoodAngle(36.0);
+          if (isDefenseMode) {
+            NetworkTableEntry currentPipeline =
+                NetworkTableInstance.getDefault().getTable("limelight-balls").getEntry("pipeline");
+            if (currentPipeline.getDouble(2) == 0) {
+              currentPipeline.setNumber(1);
+            } else if (currentPipeline.getDouble(2) == 1) {
+              currentPipeline.setNumber(0);
+            }
+            staticRPMAndHoodAngle(36.0);
+          } else {
+            NetworkTableInstance.getDefault()
+                .getTable("limelight-shooter")
+                .getEntry("ty")
+                .addListener(
+                    (thisNotif) -> {
+                      yDistance = thisNotif.getEntry().getValue().getDouble();
+                    },
+                    Constants.defaultFlags);
           }
         },
         Constants.defaultFlags);
+    //#endregion
   }
 
   /**
@@ -268,21 +296,26 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
 
-    // Driver Driving Bindings
+    //#region ====================Driver Driving Bindings=====================
     mDrivetrain.setDefaultCommand(standardGTADriveCommand);
+    //#endregion
 
-    // Driver Shifting Bindings (not needed for now)
+    //#region ============Driver Shifting Bindings (not needed for now)===========
     // oInterface.getDriveSelectButton().whenPressed(new ShiftToClimb().withTimeout(4));
     // oInterface.getDriveStartButton().whenPressed(new ShiftToDrive().withTimeout(4));
+    //#endregion
 
-    // Driver Ball Chasing Bindings
+    //#region ====================Driver Ball Chasing Bindings====================
     oInterface.getDriveAButton().whenPressed(triggerAccelBalChaseCommand);
     oInterface.getDriveBButton().whenPressed(standardGTADriveCommand);
+    //#endregion
 
-    // Driver Climbing Bindings
+    //#region =======================Driver Climbing Bindings=======================  
     oInterface.getDriveLeftBumper().whileHeld(new RunClimber(() -> (-1.0)));
     oInterface.getDriveRightBumper().whileHeld(new RunClimber(() -> (1.0)));
+    //#endregion
 
+    //#region ======================Driver Speed Bindings===========================
     oInterface
         .getDriveRightStickDownButton()
         .whenPressed(
@@ -306,8 +339,9 @@ public class RobotContainer {
                       .getEntry("Max Speed")
                       .setNumber(0.36);
                 }));
+    //#endregion
 
-    // Driver Shooter Ranging Bindings
+    //#region ===================Driver Shooter Manual Ranging Bindings====================
     oInterface
         .getDriveYButton()
         .whenPressed(
@@ -325,11 +359,11 @@ public class RobotContainer {
                     }),
                 new SetShooterPID(
                     () ->
-                        (SetShooterPID.rangeRPM1WithLL(
-                            () -> (Math.abs(yDistance) * manualRPMAdjust))),
+                        (SetShooterPID.rangeRPM1WithLL(() -> (Math.abs(yDistance)))
+                            + manualRPMAdjust),
                     () ->
-                        (SetShooterPID.rangeRPM2WithLL(
-                            () -> (Math.abs(yDistance) * manualRPMAdjust))))));
+                        (SetShooterPID.rangeRPM2WithLL(() -> (Math.abs(yDistance)))
+                            + manualRPMAdjust))));
 
     oInterface
         .getDriveDPadUp()
@@ -370,8 +404,9 @@ public class RobotContainer {
                       staticRPMAndHoodAngle(30.);
                     }),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
+    //#endregion
 
-    // Aux Manual Turret Control Bindings
+    //#region ======================Aux Manual Turret Control Bindings======================
     mTurret.setDefaultCommand(
         new RunCommand(
             () -> {
@@ -379,73 +414,72 @@ public class RobotContainer {
               // mTurret.setHood(oInterface.getAuxRightYAxis() * 0.2);
             },
             mTurret));
+    //#endregion
 
-    // Aux Ball Chasing Bindings
+    //#region ======================Aux Ball Chasing Bindings======================
     oInterface.getAuxAButton().whenPressed(standardBallChaseCommand);
     oInterface.getAuxBButton().whenPressed(standardGTADriveCommand);
+    //#endregion
 
-    // Aux Intake Bindings
+    //#region ======================Aux Intake Bindings======================
     oInterface.getAuxLeftStickDownButton().whileActiveOnce(new RunIntakeForBall());
     oInterface.getAuxLeftStickUpButton().whileActiveOnce(new RunIntakeOutForBall());
+    //#endregion
 
-    // Aux Shooting Bindings
+    //#region ======================Aux Shooting Bindings======================
     oInterface
         .getAuxRightTriggerButton()
         .whenPressed(
             new SequentialCommandGroup(
                 // new PrintCommand(
                 //     Double.toString(SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
+                new PrintCommand(
+                    "Shot Fired With RPM:"
+                        + Double.toString(
+                            SetShooterPID.rangeRPM1WithLL(
+                                () -> (Math.abs(yDistance) + manualRPMAdjust)))),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance)))),
                 new FeedBallToShooter().withTimeout(0.3)));
+    //#endregion
 
-    // Aux Aiming Binding
+    //#region ======================Aux Aiming Bindings======================
     oInterface
         .getAuxLeftTriggerButton()
         .whileActiveOnce(
             new ParallelCommandGroup(
                 new AimTurret(() -> (targetXSteer)),
                 new SetHoodAngle(() -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistance))))));
+    //#endregion
 
-    // // Aux Manual RPM Adjust Binding
-    // oInterface
-    //     .getAuxDPadUp()
-    //     .whenPressed(
-    //         new SequentialCommandGroup(
-    //             new InstantCommand(
-    //                 () -> {
-    //                   manualRPMAdjust = manualRPMAdjust + 0.05;
-    //                 }),
-    //             new SetShooterPID(
-    //                 () ->
-    //                     (SetShooterPID.rangeRPM1WithLL(
-    //                         () -> (Math.abs(yDistance) * manualRPMAdjust))),
-    //                 () ->
-    //                     (SetShooterPID.rangeRPM2WithLL(
-    //                         () -> (Math.abs(yDistance) * manualRPMAdjust))))));
+    //#region ===================Aux Manual RPM Adjust Binding====================
+    oInterface
+        .getAuxDPadUp()
+        .whenPressed(
+            new InstantCommand(
+                () -> {
+                  manualRPMAdjust = manualRPMAdjust + 50;
+                  System.out.println(manualRPMAdjust);
+                }));
 
-    // oInterface
-    //     .getAuxDPadDown()
-    //     .whenPressed(
-    //         new SequentialCommandGroup(
-    //             new InstantCommand(
-    //                 () -> {
-    //                   manualRPMAdjust = manualRPMAdjust - 0.05;
-    //                 }),
-    //             new SetShooterPID(
-    //                 () ->
-    //                     (SetShooterPID.rangeRPM1WithLL(
-    //                         () -> (Math.abs(yDistance) * manualRPMAdjust))),
-    //                 () ->
-    //                     (SetShooterPID.rangeRPM2WithLL(
-    //                         () -> (Math.abs(yDistance) * manualRPMAdjust))))));
+    oInterface
+        .getAuxDPadDown()
+        .whenPressed(
+            new InstantCommand(
+                () -> {
+                  manualRPMAdjust = manualRPMAdjust - 50;
+                  System.out.println(manualRPMAdjust);
+                }));
+    //#endregion
 
-    // Limelight Shooter Ranging
+    //#region ======================Limelight Shooter Ranging======================
     mShooter.setDefaultCommand(
         new SetShooterPID(
-            () -> (SetShooterPID.rangeRPM1WithLL(() -> (Math.abs(yDistance) * manualRPMAdjust))),
-            () -> (SetShooterPID.rangeRPM2WithLL(() -> (Math.abs(yDistance) * manualRPMAdjust)))));
+            () -> (SetShooterPID.rangeRPM1WithLL(() -> (Math.abs(yDistance))) + manualRPMAdjust),
+            () -> (SetShooterPID.rangeRPM2WithLL(() -> (Math.abs(yDistance))))));
+    //#endregion
 
-    // Aux Defense Mode Binding
+
+    //#region ======================Aux Defense Mode Binding======================
     oInterface
         .getAuxStartButton()
         .whenPressed(
@@ -457,19 +491,21 @@ public class RobotContainer {
                       .getEntry("Defense Mode")
                       .setBoolean(true);
                 }));
+    //#endregion
 
-    // DOE Bindings
+    //#region ===========================DOE Bindings===========================
     // mShooter.setDefaultCommand(dashboardBasedShooterRPMCommand);
     // oInterface.getAuxXButton().whenPressed(new SetHoodAngle(() -> (hoodAngle)));
+    //#endregion
   }
 
-private void staticRPMAndHoodAngle(double staticDistance) {
+  private void staticRPMAndHoodAngle(double staticDistance) {
     yDistance = staticDistance;
-      NetworkTableInstance.getDefault()
-          .getTable("limelight-shooter")
-          .getEntry("ty")
-          .removeListener(yDistanceListener);
-}
+    NetworkTableInstance.getDefault()
+        .getTable("limelight-shooter")
+        .getEntry("ty")
+        .removeListener(yDistanceListener);
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
