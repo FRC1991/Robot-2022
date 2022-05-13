@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DrivetrainCommands.DriveAndWait;
 import frc.robot.commands.DrivetrainCommands.DriveDistanceUntilCapture;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
-import frc.robot.commands.TurretCommands.AimTurret;
+import frc.robot.commands.TurretCommands.AimTurretNew;
 import frc.robot.commands.TurretCommands.SetHoodAngle;
 import java.util.function.Supplier;
 
@@ -19,7 +19,7 @@ public class TwoBallAuto extends SequentialCommandGroup {
             () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
         new FeedBallToShooter().withTimeout(0.3),
         new DriveDistanceUntilCapture(10, -0.9),
-        new AimTurret(targetXErrorSupplier).withTimeout(1),
+        new AimTurretNew(targetXErrorSupplier).withTimeout(1),
         new SetHoodAngle(
             () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
         new FeedBallToShooter().withTimeout(0.3));

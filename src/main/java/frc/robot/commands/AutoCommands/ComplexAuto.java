@@ -7,8 +7,9 @@ package frc.robot.commands.AutoCommands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.DrivetrainCommands.BallChase;
 import frc.robot.commands.DrivetrainCommands.TurnGyro;
+import frc.robot.commands.DrivetrainCommands.TurnUntilTargetFound;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
-import frc.robot.commands.TurretCommands.AimTurret;
+import frc.robot.commands.TurretCommands.AimTurretNew;
 import frc.robot.commands.TurretCommands.SetHoodAngle;
 import java.util.function.Supplier;
 
@@ -27,11 +28,12 @@ public class ComplexAuto extends SequentialCommandGroup {
         new TwoBallAuto(xSteerSupplier, yDistanceSupplier, targetXErrorSupplier),
         new TurnGyro(100, -0.5),
         new BallChase(xSteerSupplier),
-        new TurnGyro(50, 0.5),
-        new AimTurret(targetXErrorSupplier).withTimeout(2),
+        new TurnUntilTargetFound(0.5),
+        new AimTurretNew(targetXErrorSupplier).withTimeout(2),
         new SetHoodAngle(
             () -> (SetHoodAngle.rangeHoodAngleWithLL(Math.abs(yDistanceSupplier.get())))),
         new FeedBallToShooter().withTimeout(0.3));
+    // new TurnUntilTargetBall(-0.2),
     // new BallChase(xSteerSupplier, () -> (1.)),
     // new AimTurret(targetXErrorSupplier).withTimeout(1),
     // new SetHoodAngle(

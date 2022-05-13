@@ -4,7 +4,6 @@
 
 package frc.robot.commands.MiscCommands;
 
-import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.IntakeCommands.FeedBallToShooter;
 import frc.robot.commands.TurretCommands.SetHoodAngle;
@@ -18,7 +17,7 @@ public class ShootBallWithHoodAngle extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-        new PrintCommand(Double.toString(hoodAngle)),
+        // new PrintCommand(Double.toString(hoodAngle)),
         new SetHoodAngle(() -> (hoodAngle)).withTimeout(2),
         new FeedBallToShooter().withTimeout(0.3));
   }
