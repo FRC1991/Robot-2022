@@ -47,6 +47,5 @@ public class AimDrivetrain extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     // let driver know they have control again
-    oInterface.doubleVibrateDrive();
   }
 }

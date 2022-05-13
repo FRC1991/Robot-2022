@@ -1,6 +1,8 @@
 package frc.robot.subsystems;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix.sensors.Pigeon2;
+import com.ctre.phoenix.sensors.Pigeon2.AxisDirection;
+// import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAlternateEncoder;
@@ -23,11 +25,16 @@ public class Drivetrain extends SubsystemBase {
       rightMotor3;
   private Servo leftServo, rightServo;
 
-  private final AHRS navx;
+  // private final AHRS navx;
+  private final Pigeon2 pigeon;
 
   public Drivetrain() {
 
-    navx = new AHRS();
+    // navx = new AHRS();
+    pigeon = new Pigeon2(Constants.pigeonIMU);
+
+    pigeon.configMountPose(AxisDirection.NegativeY, AxisDirection.PositiveZ);
+    pigeon.setYaw(0);
 
     rightServo = new Servo(0);
     leftServo = new Servo(1);
@@ -132,59 +139,15 @@ public class Drivetrain extends SubsystemBase {
   }
 
   public double getYaw() {
-    return navx.getYaw();
+    return pigeon.getYaw();
   }
 
   public double getPitch() {
-    return navx.getPitch();
+    return pigeon.getPitch();
   }
 
   public double getRoll() {
-    return navx.getRoll();
-  }
-
-  public double getHeading() {
-    return navx.getFusedHeading();
-  }
-
-  public double getAngle() {
-    return navx.getAngle();
-  }
-
-  public double getDisplacementX() {
-    return navx.getDisplacementX();
-  }
-
-  public double getDisplacementY() {
-    return navx.getDisplacementY();
-  }
-
-  public double getDisplacementZ() {
-    return navx.getDisplacementZ();
-  }
-
-  public double getVelocityX() {
-    return navx.getVelocityX();
-  }
-
-  public double getVelocityY() {
-    return navx.getVelocityY();
-  }
-
-  public double getVelocityZ() {
-    return navx.getVelocityZ();
-  }
-
-  public double getAccelerationX() {
-    return navx.getWorldLinearAccelX();
-  }
-
-  public double getAccelerationY() {
-    return navx.getWorldLinearAccelY();
-  }
-
-  public double getAccelerationZ() {
-    return navx.getWorldLinearAccelZ();
+    return pigeon.getRoll();
   }
 
   public double getDistanceFeet() {
@@ -214,8 +177,6 @@ public class Drivetrain extends SubsystemBase {
     return leftMotor1;
   }
 
-  
-
   public CANSparkMax getLeftMotor2() {
     return leftMotor2;
   }
@@ -235,5 +196,4 @@ public class Drivetrain extends SubsystemBase {
   public CANSparkMax getRightMotor1() {
     return rightMotor1;
   }
-
 }

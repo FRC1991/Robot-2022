@@ -19,12 +19,12 @@ public class TurnGyro extends CommandBase {
 
   @Override
   public void initialize() {
-    initialAngle = mDrivetrain.getHeading();
+    initialAngle = mDrivetrain.getYaw();
   }
 
   @Override
   public void execute() {
-    currentAngle = mDrivetrain.getHeading();
+    currentAngle = mDrivetrain.getYaw();
     mDrivetrain.arcadeDrive(0, turnSpeed);
   }
 

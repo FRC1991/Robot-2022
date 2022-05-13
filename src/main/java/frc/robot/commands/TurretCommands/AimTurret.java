@@ -33,10 +33,10 @@ public class AimTurret extends CommandBase {
     // if target is off by more than 1 degree, adjust steering, otherwise, do nothing
     // note that this is a very rough approximation, and may need to be adjusted
     // multiplying by 0.015 to normalize the degree value to between -1 and 1
-    if (xSteer.get() > 0.000000001) {
+    if (xSteer.get() > 0.2) {
       steeringAdjust = xSteer.get() * 0.015;
       steeringAdjust = steeringAdjust * steeringScale;
-    } else if (xSteer.get() < -0.000000001) {
+    } else if (xSteer.get() < -0.2) {
       steeringAdjust = xSteer.get() * 0.015;
       steeringAdjust = steeringAdjust * steeringScale;
     } else {
@@ -47,14 +47,14 @@ public class AimTurret extends CommandBase {
           .getEntry("IsTargetFound")
           .setBoolean(true);
     }
-    System.out.printf("StrAdj: " + steeringAdjust + "\nxSteer: " + steeringAdjust + "\n\n");
+    // System.out.printf("StrAdj: " + steeringAdjust + "\nxSteer: " + xSteer + "\n\n");
     turret.setTurret(steeringAdjust);
   }
 
   @Override
   public boolean isFinished() {
-    // if target is within 1 degree, finish command
-    return Math.abs(xSteer.get()) < 0.0001;
+    // if target is within 0.2 degree, finish command
+    return Math.abs(xSteer.get()) < 0.2;
   }
 
   @Override

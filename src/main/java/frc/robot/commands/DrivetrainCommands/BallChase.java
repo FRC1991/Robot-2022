@@ -1,6 +1,7 @@
 package frc.robot.commands.DrivetrainCommands;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.OperatingInterface.OperatingInterface;
@@ -16,17 +17,17 @@ public class BallChase extends CommandBase {
   private OperatingInterface oInterface = RobotContainer.oInterface;
   private final double steeringScale = Constants.kPForVision;
   private double steeringAdjust = 0;
-  private Supplier<Double> xSteer;
-  private double speed = 1;
+  private Supplier<Double> xSteer, speed;
 
   public BallChase(Supplier<Double> xSteerSupplier) {
     drivetrain = RobotContainer.mDrivetrain;
     intake = RobotContainer.mIntake;
     addRequirements(drivetrain);
     xSteer = xSteerSupplier;
+    speed = () -> (0.93);
   }
 
-  public BallChase(Supplier<Double> xSteerSupplier, double speed) {
+  public BallChase(Supplier<Double> xSteerSupplier, Supplier<Double> speed) {
     drivetrain = RobotContainer.mDrivetrain;
     intake = RobotContainer.mIntake;
     addRequirements(drivetrain);
@@ -36,7 +37,8 @@ public class BallChase extends CommandBase {
 
   @Override
   public void initialize() {
-    oInterface.singleVibrateDrive();
+    // oInterface.singleVibrateDrive();
+    oInterface.driveJoystick.setRumble(RumbleType.kRightRumble, 1);
     NetworkTableInstance.getDefault()
         .getTable("Shuffleboard")
         .getSubTable("Main")
@@ -59,25 +61,26 @@ public class BallChase extends CommandBase {
     } else {
       steeringAdjust = 0;
     }
-    drivetrain.arcadeDrive(-speed, -steeringAdjust);
+    drivetrain.arcadeDrive(-speed.get(), -steeringAdjust);
     // System.out.println("Ball Chase Output to Drive " + steeringAdjust);
 
-    intake.setIntakeMotor1(-0.5);
-    intake.setIntakeMotor2(0.5);
+    // intake.setIntakeMotor1(-0.8);
+    intake.setIntakeMotor2(0.8);
   }
 
   @Override
   public boolean isFinished() {
     // if ball is captured, finish command
-    return intake.isBallIn();
+    return intake.isBallPresentInner();
   }
 
   @Override
   public void end(boolean interrupted) {
     // let driver know they have control again and update network tables
-    intake.setIntakeMotor1(0);
+    // intake.setIntakeMotor1(0);
     intake.setIntakeMotor2(0);
-    oInterface.doubleVibrateDrive();
+    // oInterface.doubleVibrateDrive();
+    oInterface.driveJoystick.setRumble(RumbleType.kRightRumble, 0);
     NetworkTableInstance.getDefault()
         .getTable("Shuffleboard")
         .getSubTable("Main")
